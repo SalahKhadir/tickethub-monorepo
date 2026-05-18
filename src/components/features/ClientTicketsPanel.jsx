@@ -204,27 +204,18 @@ export default function ClientTicketsPanel({
                     <p className="text-sm text-slate-grey">No tickets found.</p>
                 ) : (
                     tickets.map((ticket) => (
-                        <article key={ticket.id} className={`rounded-[14px] border bg-white p-4 transition hover:shadow-[0_4px_16px_rgba(99,102,241,0.08)] ${getCardBorderClass(ticket.priority)}`}>
-                            <div className="flex items-start justify-between gap-3">
-                                <div>
-                                    <h3 className="text-base font-semibold text-ink-black">
+                        <article key={ticket.id} className={`flex flex-col gap-4 rounded-[16px] border bg-white p-5 transition-all duration-200 hover:shadow-lg ${getCardBorderClass(ticket.priority)}`}>
+                            <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1">
+                                    <h3 className="text-lg font-semibold text-gray-900 leading-tight">
                                         {ticket.title || "Untitled ticket"}
                                     </h3>
-                                    <p className="mt-1 text-sm text-slate-grey">
+                                    <p className="mt-1.5 text-sm text-gray-500 line-clamp-2 leading-relaxed">
                                         {ticket.description || "No description provided."}
                                     </p>
                                 </div>
-                                <button
-                                    type="button"
-                                    className="h-8 rounded-xl bg-blue-600 px-4 text-xs font-medium text-white transition-all duration-200 hover:bg-blue-700 hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
-                                    onClick={() =>
-                                        setExpandedTicketId((prev) => (prev === ticket.id ? null : ticket.id))
-                                    }
-                                >
-                                    {expandedTicketId === ticket.id ? "Hide details" : "View Details"}
-                                </button>
                                 {ticket.status === "NEW" && (
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1.5 shrink-0">
                                         <button
                                             onClick={() => {
                                                 setEditingTicketId(ticket.id);
@@ -235,14 +226,14 @@ export default function ClientTicketsPanel({
                                                 });
                                                 setEditError("");
                                             }}
-                                            className="text-gray-300 hover:text-blue-500 transition p-1 rounded-lg hover:bg-blue-50"
+                                            className="text-gray-400 hover:text-blue-600 transition-colors p-2 rounded-xl hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                                             title="Edit ticket"
                                         >
                                             ✏️
                                         </button>
                                         <button
                                             onClick={() => setDeletingTicketId(ticket.id)}
-                                            className="text-gray-300 hover:text-red-500 transition p-1 rounded-lg hover:bg-red-50"
+                                            className="text-gray-400 hover:text-red-600 transition-colors p-2 rounded-xl hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500/20"
                                             title="Delete ticket"
                                         >
                                             🗑
@@ -251,12 +242,26 @@ export default function ClientTicketsPanel({
                                 )}
                             </div>
 
-                            <div className="mt-3 flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide">
-                                <StatusBadge status={ticket.status} />
-                                <PriorityBadge priority={ticket.priority} />
-                                <span className="rounded-full border border-[rgba(17,24,39,0.10)] bg-white px-3 py-1 text-slate-grey h-[26px] inline-flex items-center transition-all duration-300 hover:-translate-y-0.5 hover:scale-105 hover:shadow-md hover:bg-gray-50 cursor-default">
-                                    Category: {ticket.category || "N/A"}
-                                </span>
+                            <div className="flex items-center justify-between mt-1 pt-4 border-t border-gray-100">
+                                <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-wider">
+                                    <StatusBadge status={ticket.status} />
+                                    <PriorityBadge priority={ticket.priority} />
+                                    <span className="rounded-full border border-gray-200 bg-white px-3 py-1 text-gray-500 h-[26px] inline-flex items-center transition-all duration-300 hover:bg-gray-50 cursor-default shadow-sm">
+                                        {ticket.category || "N/A"}
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center justify-center h-[34px] rounded-full border border-blue-200 bg-blue-50/50 px-5 text-[13px] font-medium text-blue-700 transition-all duration-200 hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/20 active:scale-[0.98]"
+                                    onClick={() =>
+                                        setExpandedTicketId((prev) => (prev === ticket.id ? null : ticket.id))
+                                    }
+                                >
+                                    {expandedTicketId === ticket.id ? "Hide Details" : "View Details"}
+                                    <svg className={`ml-2 h-4 w-4 transition-transform duration-200 ${expandedTicketId === ticket.id ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
                             </div>
 
                             {deletingTicketId === ticket.id && (

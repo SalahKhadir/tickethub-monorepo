@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import AdminOverviewPanel from "@/components/features/AdminOverviewPanel";
 import { useTickets } from "@/hooks/useTickets";
 

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
-import TicketCard from "@/components/features/TicketCard";
 import TicketActions from "@/components/features/TicketActions";
 import { useAuth } from "@/hooks/useAuth";
 import { useTickets } from "@/hooks/useTickets";
@@ -189,10 +188,10 @@ export default function AdminTicketsPage() {
     // Leverage the new useTickets custom hook for isolated state management
     const { tickets, loading, filters, updateFilter, refresh } = useTickets();
 
-    const [expandedTicketId,         setExpandedTicketId]         = useState(null);
     const [assignmentOpenTicketId,   setAssignmentOpenTicketId]   = useState(null);
     const [assignedTechnicianByTicket, setAssignedTechnicianByTicket] = useState({});
     const [assignmentFeedback,       setAssignmentFeedback]       = useState({ type: "", message: "" });
+    const [selectedTicket,           setSelectedTicket]           = useState(null);
 
     const isAdmin = String(user?.role || "").toLowerCase() === ROLES.ADMIN;
 
@@ -213,6 +212,7 @@ export default function AdminTicketsPage() {
     const selectClass = "h-11 rounded-[10px] border border-[rgba(17,24,39,0.12)] bg-white px-4 text-sm text-ink-black focus:border-electric-sapphire focus:outline-none focus:ring-2 focus:ring-[rgba(99,102,241,0.15)]";
 
     return (
+    <>
         <section className="rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white p-8 shadow-sm">
             {/* Header */}
             <div className="flex flex-wrap items-start justify-between gap-4">
@@ -271,7 +271,7 @@ export default function AdminTicketsPage() {
             </div>
 
             {/* Ticket list */}
-            <div className="mt-6 space-y-3">
+            <div className="mt-6 space-y-4 w-full">
                 {loading ? (
                     <p className="text-sm text-slate-grey">Loading tickets…</p>
                 ) : tickets.length === 0 ? (
@@ -280,104 +280,196 @@ export default function AdminTicketsPage() {
                     </div>
                 ) : (
                     tickets.map((ticket) => {
-                        const status      = String(ticket.status || "").toUpperCase();
-                        const isAssignable = status === "ACCEPTED" || status === "NEW";
-                        const assigneeName = ticket.assigneeName || assignedTechnicianByTicket[ticket.id];
+                        const status       = String(ticket.status || "").toUpperCase();
+                        const assigneeName = ticket.assigneeName || ticket.technicianName || assignedTechnicianByTicket[ticket.id];
+                        const clientName   = ticket.authorName || ticket.clientName || ticket.createdBy || "Client";
 
                         return (
-                            <TicketCard
+                            <div
                                 key={ticket.id}
-                                ticket={ticket}
-                                expanded={expandedTicketId === ticket.id}
-                                onToggleDetails={() =>
-                                    setExpandedTicketId((prev) => (prev === ticket.id ? null : ticket.id))
-                                }
-                                headerRight={
-                                    isAssignable
-                                        ? assigneeName
-                                            ? (
-                                                <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                                className="bg-white border border-gray-200/80 rounded-xl p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-6 hover:border-gray-300 hover:shadow-sm transition-all duration-200"
+                            >
+                                {/* Left: ticket info */}
+                                <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                                    {/* ID + Title */}
+                                    <div className="space-y-1">
+                                        <span className="text-xs font-mono text-gray-400 bg-gray-50 px-2 py-0.5 rounded border border-gray-100 inline-block">
+                                            #TK-{ticket.id}
+                                        </span>
+                                        <h3 className="text-sm font-semibold text-gray-900 tracking-tight block truncate" title={ticket.title}>
+                                            {ticket.title || "Untitled"}
+                                        </h3>
+                                    </div>
+
+                                    {/* Category + Client */}
+                                    <div className="flex flex-col space-y-1">
+                                        <span className="text-xs text-gray-400">
+                                            Category: <strong className="text-gray-700 font-medium">{ticket.category || "—"}</strong>
+                                        </span>
+                                        <span className="text-xs text-gray-400">
+                                            Client: <strong className="text-gray-700 font-medium">{clientName}</strong>
+                                        </span>
+                                    </div>
+
+                                    {/* Badges */}
+                                    <div className="flex gap-2 items-center md:justify-end flex-wrap">
+                                        <PriorityBadge priority={ticket.priority} />
+                                        <StatusBadge status={ticket.status} />
+                                    </div>
+                                </div>
+
+                                {/* Right: action zone — fixed horizontal row */}
+                                <div className="flex flex-row items-center gap-3 justify-end min-w-[360px] h-10 border-l border-gray-200/60 pl-4">
+
+                                    {/* View Details — always visible */}
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedTicket(ticket)}
+                                        className="h-full px-4 border border-gray-200 rounded-lg text-xs font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300 transition-all whitespace-nowrap flex items-center justify-center"
+                                    >
+                                        View Details
+                                    </button>
+
+                                    {/* Dynamic action — fixed w-48 */}
+                                    <div className="w-48 h-full">
+                                        {status === "NEW" ? (
+                                            <div className="w-full h-full flex items-center">
+                                                <TicketActions ticket={ticket} onActionComplete={refresh} />
+                                            </div>
+                                        ) : status === "ACCEPTED" ? (
+                                            assigneeName ? (
+                                                <div className="w-full h-full flex items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 text-xs font-semibold text-emerald-700 whitespace-nowrap">
+                                                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
                                                     {assigneeName}
-                                                </span>
+                                                </div>
                                             ) : (
                                                 <button
                                                     type="button"
-                                                    className="bg-blue-600 text-white rounded-xl px-4 py-1.5 text-xs font-bold hover:bg-blue-700 hover:shadow-md transition-all active:translate-y-0 hover:-translate-y-0.5"
+                                                    className="w-full h-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium px-4 rounded-lg transition-all active:scale-[0.98] shadow-sm flex items-center justify-center whitespace-nowrap"
                                                     onClick={() =>
                                                         setAssignmentOpenTicketId((prev) =>
                                                             prev === ticket.id ? null : ticket.id
                                                         )
                                                     }
                                                 >
-                                                    Assign Tech
+                                                    {assignmentOpenTicketId === ticket.id ? "Cancel" : "Assign Technician"}
                                                 </button>
                                             )
-                                        : null
-                                }
-                                details={
-                                    <div className="grid gap-4 rounded-xl border border-gray-100 bg-gray-50/50 p-5 text-sm text-gray-800 md:grid-cols-2 shadow-inner">
-                                        <div className="space-y-3">
-                                            <p className="flex justify-between border-b border-gray-100 pb-2">
-                                                <span className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Ticket ID</span>
-                                                <span className="font-medium text-gray-900 font-mono">TH-{ticket.id || "0"}</span>
-                                            </p>
-                                            <p className="flex justify-between border-b border-gray-100 pb-2">
-                                                <span className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Created At</span>
-                                                <span className="font-medium text-gray-900">{formatDate(ticket.createdAt)}</span>
-                                            </p>
-                                            <p className="flex justify-between border-b border-gray-100 pb-2">
-                                                <span className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Updated At</span>
-                                                <span className="font-medium text-gray-900">{formatDate(ticket.updatedAt)}</span>
-                                            </p>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <p className="flex justify-between border-b border-gray-100 pb-2">
-                                                <span className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Assignee</span>
-                                                <span className="font-medium text-gray-900">{assigneeName || "Unassigned"}</span>
-                                            </p>
-                                            <p className="flex justify-between border-b border-gray-100 pb-2">
-                                                <span className="font-semibold text-gray-500 uppercase tracking-wider text-xs">Reporter</span>
-                                                <span className="font-medium text-gray-900">{ticket.authorName || ticket.createdBy || ticket.clientName || "Unknown"}</span>
-                                            </p>
-                                            <p className="flex justify-between border-b border-gray-100 pb-2">
-                                                <span className="font-semibold text-gray-500 uppercase tracking-wider text-xs">SLA Deadline</span>
-                                                <span className="font-medium text-red-600">{formatDate(ticket.slaDeadline)}</span>
-                                            </p>
-                                        </div>
-                                        {ticket.solution && (
-                                            <div className="md:col-span-2 mt-2 bg-blue-50 border border-blue-100 rounded-xl p-4">
-                                                <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider mb-2">Resolution details</h4>
-                                                <p className="text-sm text-blue-900 font-medium leading-relaxed">{ticket.solution}</p>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-xs text-gray-400 bg-gray-50 border border-gray-200/60 px-3 rounded-lg italic whitespace-nowrap">
+                                                {assigneeName ? `Tech: ${assigneeName}` : "In progress"}
                                             </div>
                                         )}
                                     </div>
-                                }
-                            >
-                                <div className="mt-4 flex flex-wrap items-center gap-3">
-                                    <StatusBadge status={ticket.status} />
-                                    <PriorityBadge priority={ticket.priority} />
-                                    <span className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-bold text-gray-600 uppercase tracking-wider inline-flex items-center shadow-sm">
-                                        {ticket.category || "Uncategorized"}
-                                    </span>
                                 </div>
 
-                                <div className="mt-5">
-                                    <TicketActions ticket={ticket} onActionComplete={refresh} />
-                                </div>
-
-                                {assignmentOpenTicketId === ticket.id && (
+                            {/* Assignment panel — full width row below the ticket info */}
+                            {assignmentOpenTicketId === ticket.id && (
+                                <div className="w-full border-t border-gray-100 pt-4 mt-2">
                                     <AssignmentPanel
                                         ticketId={ticket.id}
                                         onAssigned={(name) => handleAssigned(ticket.id, name)}
                                         onCancel={() => setAssignmentOpenTicketId(null)}
                                     />
-                                )}
-                            </TicketCard>
+                                </div>
+                            )}
+                        </div>
                         );
                     })
                 )}
             </div>
         </section>
+
+        {/* Slide-over detail panel */}
+        {selectedTicket && (
+            <div className="fixed inset-0 z-50 flex justify-end bg-black/30 backdrop-blur-sm">
+                <div className="absolute inset-0" onClick={() => setSelectedTicket(null)} />
+                <div className="relative w-full max-w-lg bg-white border-l border-gray-200 h-full p-6 shadow-2xl flex flex-col gap-6 overflow-y-auto">
+
+                    {/* Header */}
+                    <div className="flex items-start justify-between border-b border-gray-100 pb-4">
+                        <div>
+                            <span className="text-[11px] font-mono text-gray-400 block">#TK-{selectedTicket.id}</span>
+                            <h3 className="text-lg font-semibold text-gray-900 mt-1 leading-snug">{selectedTicket.title}</h3>
+                        </div>
+                        <button
+                            onClick={() => setSelectedTicket(null)}
+                            className="text-gray-400 hover:text-gray-700 p-1.5 rounded-lg hover:bg-gray-100 transition-all shrink-0"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Meta grid */}
+                    <div className="grid grid-cols-2 gap-4 bg-gray-50 border border-gray-100 rounded-xl p-4">
+                        <div>
+                            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Status</span>
+                            <div className="mt-1"><StatusBadge status={selectedTicket.status} /></div>
+                        </div>
+                        <div>
+                            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Priority</span>
+                            <div className="mt-1"><PriorityBadge priority={selectedTicket.priority} /></div>
+                        </div>
+                        <div className="pt-2">
+                            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Category</span>
+                            <span className="text-sm font-medium text-gray-900 block mt-0.5">{selectedTicket.category || "—"}</span>
+                        </div>
+                        <div className="pt-2">
+                            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Created By</span>
+                            <span className="text-sm font-medium text-gray-900 block mt-0.5">
+                                {selectedTicket.authorName || selectedTicket.clientName || selectedTicket.createdBy || "Client"}
+                            </span>
+                        </div>
+                        <div className="pt-2">
+                            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Created At</span>
+                            <span className="text-sm font-medium text-gray-900 block mt-0.5">{formatDate(selectedTicket.createdAt)}</span>
+                        </div>
+                        <div className="pt-2">
+                            <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">SLA Deadline</span>
+                            <span className="text-sm font-medium text-red-600 block mt-0.5">{formatDate(selectedTicket.slaDeadline)}</span>
+                        </div>
+                    </div>
+
+                    {/* Description */}
+                    <div className="space-y-2">
+                        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider block">Incident Description</span>
+                        <div className="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap max-h-60 overflow-y-auto">
+                            {selectedTicket.description || "No description provided."}
+                        </div>
+                    </div>
+
+                    {/* Assigned technician */}
+                    {(selectedTicket.technicianName || selectedTicket.assigneeName || assignedTechnicianByTicket[selectedTicket.id]) && (
+                        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                            <span className="text-[10px] font-medium text-blue-500 uppercase tracking-wider block">Assigned Expert</span>
+                            <span className="text-sm font-semibold text-gray-900 block mt-0.5">
+                                {selectedTicket.technicianName || selectedTicket.assigneeName || assignedTechnicianByTicket[selectedTicket.id]}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Resolution (if resolved) */}
+                    {selectedTicket.solution && (
+                        <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+                            <span className="text-[10px] font-medium text-emerald-600 uppercase tracking-wider block">Resolution</span>
+                            <p className="text-sm text-emerald-900 mt-1 leading-relaxed">{selectedTicket.solution}</p>
+                        </div>
+                    )}
+
+                    {/* Footer */}
+                    <div className="mt-auto border-t border-gray-100 pt-4 flex justify-end">
+                        <button
+                            onClick={() => setSelectedTicket(null)}
+                            className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-medium px-4 py-2.5 rounded-lg transition-all"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+    </>
     );
 }
