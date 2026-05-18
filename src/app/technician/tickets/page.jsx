@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useTickets } from "@/hooks/useTickets";
@@ -238,16 +238,16 @@ export default function TechnicianTicketsPage() {
         );
     }, [allTickets, searchTerm]);
 
-    const handleStartWork = async (ticketId) => {
+    const handleStartWork = useCallback(async (ticketId) => {
         try {
             await updateTicketStatus(ticketId, "IN_PROGRESS");
             refresh();
         } catch (err) {
             console.error("Error starting work:", err);
         }
-    };
+    }, [refresh]);
 
-    const handleResolve = async (ticketId) => {
+    const handleResolve = useCallback(async (ticketId) => {
         if (!resolveSolution.trim()) {
             setResolveError("Please describe the solution before resolving.");
             return;
@@ -266,14 +266,14 @@ export default function TechnicianTicketsPage() {
         } finally {
             setResolving(false);
         }
-    };
+    }, [refresh, resolveSolution]);
 
-    const closeResolveModal = () => {
+    const closeResolveModal = useCallback(() => {
         if (resolving) return;
         setResolveTicketId(null);
         setResolveSolution("");
         setResolveError("");
-    };
+    }, [resolving]);
 
     if (authLoading || (!isAuthenticated && !isTechnician)) {
         return null;

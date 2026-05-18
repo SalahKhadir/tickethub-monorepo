@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useFetch } from "@/hooks/useFetch";
 import { ROUTES } from "@/constants/routes";
@@ -33,16 +33,8 @@ const Card = ({ icon: Icon, title, value, iconBg, iconColor }) => (
     </div>
 );
 
-export default function AdminOverviewPanel() {
+export default function AdminOverviewPanel({ tickets = [] }) {
     const router = useRouter();
-
-    const { data: pageData, loading, error, refetch } = useFetch("/api/tickets?page=0", {
-        fallbackUrls: ["/api/admin/tickets?page=0"],
-    });
-
-    const tickets = useMemo(() => {
-        return Array.isArray(pageData?.content) ? pageData.content : [];
-    }, [pageData]);
 
     const stats = useMemo(() => {
         const slaBreaches = tickets.filter(t =>
@@ -79,14 +71,9 @@ export default function AdminOverviewPanel() {
             .slice(0, 5)
         , [tickets]);
 
-    useEffect(() => {
-        const interval = setInterval(() => refetch(), 60000);
-        return () => clearInterval(interval);
-    }, [refetch]);
-
-    const handleRowClick = () => {
+    const handleRowClick = useCallback(() => {
         router.push("/dashboard/admin/tickets");
-    };
+    }, [router]);
 
     return (
         <div className="space-y-6">
@@ -168,18 +155,7 @@ export default function AdminOverviewPanel() {
                     </Link>
                 </div>
 
-                {error ? (
-                    <div className="px-6 py-4 bg-red-50 border-b border-red-200 text-sm text-red-600">
-                        {error}
-                    </div>
-                ) : null}
-
-                {loading ? (
-                    <div className="px-6 py-8 text-center text-sm text-gray-500">
-                        Loading tickets...
-                    </div>
-                ) : (
-                    <table className="w-full">
+                <table className="w-full">
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-6 py-3">Ticket ID</th>
@@ -230,7 +206,6 @@ export default function AdminOverviewPanel() {
                             )}
                         </tbody>
                     </table>
-                )}
 
                 <div className="px-6 py-4 border-t border-gray-100">
                     <Link

@@ -31,35 +31,19 @@ const getCardBorderClass = (priority) => {
     return "border-blue-400";
 };
 
-export default function ClientTicketsPanel() {
+export default function ClientTicketsPanel({
+    tickets = [],
+    totalPages = 0,
+    loading = false,
+    filters = {},
+    updateFilter = () => {},
+    refresh = () => {}
+}) {
     const router       = useRouter();
     const pathname     = usePathname();
     const searchParams = useSearchParams();
 
-    const pageParam     = Number(searchParams.get("page")     || "0");
-    const statusParam   = searchParams.get("status")   || "";
-    const priorityParam = searchParams.get("priority") || "";
-    const keywordParam  = searchParams.get("keyword")  || "";
-
-    const pushParams = useCallback((updates) => {
-        const params = new URLSearchParams(searchParams.toString());
-        Object.entries(updates).forEach(([k, v]) => {
-            if (v) params.set(k, v); else params.delete(k);
-        });
-        params.set("page", "0");
-        router.replace(`${pathname}?${params.toString()}`);
-    }, [searchParams, pathname, router]);
-
-    const setPage = useCallback((p) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("page", String(p));
-        router.replace(`${pathname}?${params.toString()}`);
-    }, [searchParams, pathname, router]);
-
-    const [tickets, setTickets] = useState([]);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [totalPages, setTotalPages] = useState(0);
     const [expandedTicketId, setExpandedTicketId] = useState(null);
     const [deletingTicketId, setDeletingTicketId] = useState(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -69,40 +53,13 @@ export default function ClientTicketsPanel() {
     const [editLoading, setEditLoading] = useState(false);
     const [editError, setEditError] = useState("");
 
-    const loadTickets = useCallback(async () => {
-        setLoading(true);
-        setError("");
-
-        try {
-            const pageData = await getTickets({
-                page: pageParam,
-                status:   statusParam   || undefined,
-                priority: priorityParam || undefined,
-                keyword:  keywordParam  || undefined,
-            });
-
-            setTickets(Array.isArray(pageData?.content) ? pageData.content : []);
-            setTotalPages(
-                typeof pageData?.totalPages === "number" ? pageData.totalPages : 0
-            );
-        } catch (err) {
-            const backendMessage =
-                err?.response?.data?.message || err?.response?.data?.error || "";
-            setError(backendMessage || "Unable to load recent tickets.");
-            setTickets([]);
-            setTotalPages(0);
-        } finally {
-            setLoading(false);
-        }
-    }, [pageParam, priorityParam, statusParam, keywordParam]);
-    
-    const handleDeleteTicket = async (ticketId) => {
+    const handleDeleteTicket = useCallback(async (ticketId) => {
         setDeleteLoading(true);
         setDeleteError("");
         try {
             await fetchAPI(`/api/tickets/${ticketId}`, { method: "DELETE" });
             setDeletingTicketId(null);
-            loadTickets();
+            refresh();
         } catch (err) {
             setDeleteError(
                 err?.response?.data?.message ||
@@ -112,9 +69,9 @@ export default function ClientTicketsPanel() {
         } finally {
             setDeleteLoading(false);
         }
-    };
+    }, [refresh]);
 
-    const handleEditSubmit = async (ticketId) => {
+    const handleEditSubmit = useCallback(async (ticketId) => {
         if (!editForm.title.trim()) {
             setEditError("Title cannot be empty.");
             return;
@@ -135,7 +92,7 @@ export default function ClientTicketsPanel() {
                 },
             });
             setEditingTicketId(null);
-            loadTickets();
+            refresh();
         } catch (err) {
             setEditError(
                 err?.response?.data?.message ||
@@ -145,14 +102,20 @@ export default function ClientTicketsPanel() {
         } finally {
             setEditLoading(false);
         }
-    };
+    }, [editForm, refresh]);
 
-    useEffect(() => {
-        loadTickets();
-    }, [loadTickets]);
+    const hasPrevious = filters.page > 0;
+    const hasNext = totalPages > 0 && filters.page + 1 < totalPages;
 
-    const hasPrevious = pageParam > 0;
-    const hasNext = totalPages > 0 && pageParam + 1 < totalPages;
+    const pushParams = useCallback((updates) => {
+        Object.entries(updates).forEach(([k, v]) => {
+            updateFilter(k, v);
+        });
+    }, [updateFilter]);
+
+    const setPage = useCallback((p) => {
+        updateFilter("page", p);
+    }, [updateFilter]);
 
     return (
         <section className="rounded-2xl border border-[rgba(17,24,39,0.08)] bg-white p-8 shadow-sm">
@@ -188,13 +151,13 @@ export default function ClientTicketsPanel() {
                 <div className="flex flex-wrap items-center gap-2">
                     <input
                         type="search"
-                        value={keywordParam}
+                        value={filters.keyword}
                         onChange={(e) => pushParams({ keyword: e.target.value })}
                         placeholder="Search tickets…"
                         className="h-10 rounded-[10px] border border-[rgba(17,24,39,0.12)] bg-white px-3 text-sm text-ink-black placeholder:text-slate-grey focus:border-electric-sapphire focus:outline-none focus:ring-2 focus:ring-[rgba(99,102,241,0.15)] w-48"
                     />
                     <select
-                        value={statusParam}
+                        value={filters.status}
                         onChange={(e) => pushParams({ status: e.target.value })}
                         className="h-10 rounded-[10px] border border-[rgba(17,24,39,0.12)] bg-white px-3 text-sm text-ink-black focus:border-electric-sapphire focus:outline-none focus:ring-2 focus:ring-[rgba(99,102,241,0.15)]"
                     >
@@ -205,7 +168,7 @@ export default function ClientTicketsPanel() {
                         ))}
                     </select>
                     <select
-                        value={priorityParam}
+                        value={filters.priority}
                         onChange={(e) => pushParams({ priority: e.target.value })}
                         className="h-10 rounded-[10px] border border-[rgba(17,24,39,0.12)] bg-white px-3 text-sm text-ink-black focus:border-electric-sapphire focus:outline-none focus:ring-2 focus:ring-[rgba(99,102,241,0.15)]"
                     >
@@ -221,7 +184,7 @@ export default function ClientTicketsPanel() {
                     type="button"
                     variant="ghost"
                     className="h-10 px-4"
-                    onClick={loadTickets}
+                    onClick={refresh}
                     disabled={loading}
                 >
                     Refresh
@@ -422,20 +385,20 @@ export default function ClientTicketsPanel() {
                     type="button"
                     variant="ghost"
                     disabled={!hasPrevious || loading}
-                    onClick={() => setPage(pageParam - 1)}
+                    onClick={() => setPage(filters.page - 1)}
                 >
                     Previous
                 </Button>
 
                 <p className="text-sm text-slate-grey">
-                    Page {totalPages === 0 ? 0 : pageParam + 1} / {totalPages}
+                    Page {totalPages === 0 ? 0 : filters.page + 1} / {totalPages}
                 </p>
 
                 <Button
                     type="button"
                     variant="ghost"
                     disabled={!hasNext || loading}
-                    onClick={() => setPage(pageParam + 1)}
+                    onClick={() => setPage(filters.page + 1)}
                 >
                     Next
                 </Button>
