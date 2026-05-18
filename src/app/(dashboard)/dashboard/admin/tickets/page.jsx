@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import TicketCard from "@/components/features/TicketCard";
 import TicketActions from "@/components/features/TicketActions";
 import { useAuth } from "@/hooks/useAuth";
-import { useFetch } from "@/hooks/useFetch";
+import { useTickets } from "@/hooks/useTickets";
 import { ROLES } from "@/constants/roles";
 import { assignTicket, getTechnicians, getTechnicianAvailability } from "@/services/api";
 import PriorityBadge from "@/components/ui/PriorityBadge";
@@ -184,15 +184,10 @@ function AssignmentPanel({ ticketId, onAssigned, onCancel }) {
 // ── Page ─────────────────────────────────────────────────────────────────────
 export default function AdminTicketsPage() {
     const router      = useRouter();
-    const pathname    = usePathname();
-    const searchParams = useSearchParams();
     const { user, loading: authLoading, isAuthenticated } = useAuth();
-
-    // Read filters from URL
-    const pageParam     = Number(searchParams.get("page")     || "0");
-    const statusParam   = searchParams.get("status")   || "";
-    const priorityParam = searchParams.get("priority") || "";
-    const categoryParam = searchParams.get("category") || "";
+    
+    // Leverage the new useTickets custom hook for isolated state management
+    const { tickets, loading, filters, updateFilter, refresh } = useTickets();
 
     const [expandedTicketId,         setExpandedTicketId]         = useState(null);
     const [assignmentOpenTicketId,   setAssignmentOpenTicketId]   = useState(null);
@@ -206,44 +201,12 @@ export default function AdminTicketsPage() {
         if (!isAuthenticated || !isAdmin) router.replace("/login");
     }, [authLoading, isAuthenticated, isAdmin, router]);
 
-    // Push filter changes to URL
-    const pushParams = useCallback((updates) => {
-        const params = new URLSearchParams(searchParams.toString());
-        Object.entries(updates).forEach(([k, v]) => {
-            if (v) params.set(k, v); else params.delete(k);
-        });
-        params.set("page", "0"); // reset to first page on filter change
-        router.replace(`${pathname}?${params.toString()}`);
-    }, [searchParams, pathname, router]);
-
-    const setPage = useCallback((p) => {
-        const params = new URLSearchParams(searchParams.toString());
-        params.set("page", String(p));
-        router.replace(`${pathname}?${params.toString()}`);
-    }, [searchParams, pathname, router]);
-
-    const ticketsUrl = useMemo(() => {
-        const params = new URLSearchParams();
-        params.set("page", String(pageParam));
-        if (statusParam)   params.set("status",   statusParam);
-        if (priorityParam) params.set("priority", priorityParam);
-        if (categoryParam) params.set("category", categoryParam);
-        return `/api/tickets?${params.toString()}`;
-    }, [pageParam, statusParam, priorityParam, categoryParam]);
-
-    const { data: pageData, loading, error, refetch } = useFetch(ticketsUrl, {
-        fallbackUrls: [`/api/admin/tickets?page=${pageParam}`],
-    });
-
-    const tickets    = useMemo(() => Array.isArray(pageData?.content) ? pageData.content : [], [pageData]);
-    const totalPages = typeof pageData?.totalPages === "number" ? pageData.totalPages : 0;
-
     const handleAssigned = useCallback((ticketId, techName) => {
         setAssignedTechnicianByTicket((prev) => ({ ...prev, [ticketId]: techName }));
         setAssignmentOpenTicketId(null);
         setAssignmentFeedback({ type: "success", message: "Ticket assigned successfully." });
-        refetch();
-    }, [refetch]);
+        refresh();
+    }, [refresh]);
 
     if (authLoading || (!isAuthenticated && !isAdmin)) return null;
 
@@ -280,38 +243,32 @@ export default function AdminTicketsPage() {
             {/* Filter bar */}
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
-                    <select className={selectClass} value={statusParam}
-                        onChange={(e) => pushParams({ status: e.target.value })}>
+                    <select className={selectClass} value={filters.status}
+                        onChange={(e) => updateFilter('status', e.target.value)}>
                         {STATUS_OPTIONS.map((s) => (
                             <option key={s || "ALL_STATUS"} value={s}>{s || "All statuses"}</option>
                         ))}
                     </select>
 
-                    <select className={selectClass} value={priorityParam}
-                        onChange={(e) => pushParams({ priority: e.target.value })}>
+                    <select className={selectClass} value={filters.priority}
+                        onChange={(e) => updateFilter('priority', e.target.value)}>
                         {PRIORITY_OPTIONS.map((p) => (
                             <option key={p || "ALL_PRIORITY"} value={p}>{p || "All priorities"}</option>
                         ))}
                     </select>
 
-                    <select className={selectClass} value={categoryParam}
-                        onChange={(e) => pushParams({ category: e.target.value })}>
+                    <select className={selectClass} value={filters.category}
+                        onChange={(e) => updateFilter('category', e.target.value)}>
                         {CATEGORY_OPTIONS.map((c) => (
                             <option key={c || "ALL_CATEGORY"} value={c}>{c || "All categories"}</option>
                         ))}
                     </select>
                 </div>
 
-                <Button type="button" variant="ghost" className="h-11 px-5" onClick={refetch} disabled={loading}>
+                <Button type="button" variant="ghost" className="h-11 px-5" onClick={refresh} disabled={loading}>
                     Refresh
                 </Button>
             </div>
-
-            {error && (
-                <div className="mt-4 rounded-[10px] border border-[rgba(239,68,68,0.25)] bg-[#FEE2E2] px-4 py-3 text-sm text-[#991B1B]">
-                    {error}
-                </div>
-            )}
 
             {/* Ticket list */}
             <div className="mt-6 space-y-3">
@@ -406,7 +363,7 @@ export default function AdminTicketsPage() {
                                 </div>
 
                                 <div className="mt-5">
-                                    <TicketActions ticket={ticket} onActionComplete={refetch} />
+                                    <TicketActions ticket={ticket} onActionComplete={refresh} />
                                 </div>
 
                                 {assignmentOpenTicketId === ticket.id && (
@@ -420,23 +377,6 @@ export default function AdminTicketsPage() {
                         );
                     })
                 )}
-            </div>
-
-            {/* Pagination */}
-            <div className="mt-6 flex items-center justify-between gap-3">
-                <Button type="button" variant="ghost"
-                    disabled={pageParam === 0 || loading}
-                    onClick={() => setPage(pageParam - 1)}>
-                    Previous
-                </Button>
-                <p className="text-sm text-slate-grey">
-                    Page {totalPages === 0 ? 0 : pageParam + 1} / {totalPages}
-                </p>
-                <Button type="button" variant="ghost"
-                    disabled={!(totalPages > 0 && pageParam + 1 < totalPages) || loading}
-                    onClick={() => setPage(pageParam + 1)}>
-                    Next
-                </Button>
             </div>
         </section>
     );

@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useFetch } from "@/hooks/useFetch";
+import { useTickets } from "@/hooks/useTickets";
+import TechnicianTicketsTable from "@/components/features/TechnicianTicketsTable";
 import { ROLES } from "@/constants/roles";
 import PriorityBadge from "@/components/ui/PriorityBadge";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -227,14 +228,7 @@ export default function TechnicianTicketsPage() {
         }
     }, [authLoading, isAuthenticated, isTechnician, router]);
 
-    const { data: pageData, loading, error, refetch } = useFetch(
-        "/api/tickets?page=0&status=NEW,ACCEPTED,IN_PROGRESS",
-        { fallbackUrls: ["/api/tickets?page=0"] }
-    );
-
-    const allTickets = useMemo(() => {
-        return Array.isArray(pageData?.content) ? pageData.content : [];
-    }, [pageData]);
+    const { tickets: allTickets, loading, refresh } = useTickets(['NEW', 'ACCEPTED', 'IN_PROGRESS']);
 
     const searchLower = searchTerm.toLowerCase();
     const filteredTickets = useMemo(() => {
@@ -244,20 +238,10 @@ export default function TechnicianTicketsPage() {
         );
     }, [allTickets, searchTerm]);
 
-    const newTickets = useMemo(() =>
-        filteredTickets.filter((t) => {
-            const s = (t?.status || "").toUpperCase();
-            return s === "NEW" || s === "ACCEPTED";
-        }), [filteredTickets]);
-
-    const inProgressTickets = useMemo(() =>
-        filteredTickets.filter((t) => (t?.status || "").toUpperCase() === "IN_PROGRESS"),
-    [filteredTickets]);
-
     const handleStartWork = async (ticketId) => {
         try {
             await updateTicketStatus(ticketId, "IN_PROGRESS");
-            refetch();
+            refresh();
         } catch (err) {
             console.error("Error starting work:", err);
         }
@@ -275,7 +259,7 @@ export default function TechnicianTicketsPage() {
             setResolveTicketId(null);
             setResolveSolution("");
             setResolveError("");
-            refetch();
+            refresh();
         } catch (err) {
             const message = err?.response?.data?.message || err?.message || "Failed to resolve ticket. Try again.";
             setResolveError(message);
@@ -313,33 +297,22 @@ export default function TechnicianTicketsPage() {
             </div>
 
             {/* Error Message */}
-            {error && (
+            {resolveError && (
                 <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-                    {error}
+                    {resolveError}
                 </div>
             )}
 
-            {/* Kanban Columns */}
+            {/* Technician Tickets Table */}
             {loading ? (
                 <div className="text-center text-gray-500 py-8">Loading tickets...</div>
             ) : (
                 <div className="max-w-7xl mx-auto w-full">
-                    <div className="grid grid-cols-2 gap-8">
-                        <KanbanColumn
-                            title="New / Accepted"
-                            tickets={newTickets}
-                            status="NEW"
-                            onStartWork={handleStartWork}
-                            onResolveClick={() => {}}
-                        />
-                        <KanbanColumn
-                            title="In Progress"
-                            tickets={inProgressTickets}
-                            status="IN_PROGRESS"
-                            onStartWork={() => {}}
-                            onResolveClick={(ticketId) => setResolveTicketId(ticketId)}
-                        />
-                    </div>
+                    <TechnicianTicketsTable 
+                        tickets={filteredTickets} 
+                        onStartWork={handleStartWork}
+                        onResolveClick={setResolveTicketId}
+                    />
                 </div>
             )}
 

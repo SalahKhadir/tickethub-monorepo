@@ -9,6 +9,8 @@ export default function TechnicianTicketsTable({
   page = 0,
   totalPages = 0,
   onPageChange,
+  onStartWork,
+  onResolveClick
 }) {
   const hasPrevious = page > 0;
   const hasNext = totalPages > 0 && page + 1 < totalPages;
