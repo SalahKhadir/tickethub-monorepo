@@ -16,23 +16,42 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
+    /**
+     * Javadoc.
+     */
     private final SecretKey secretKey;
+    /**
+     * Javadoc.
+     */
     private final long jwtExpirationMs;
 
+    /**
+     * Javadoc.
+      * @param jwtExpirationMs description
+      * @param jwtSecret description
+     */
     public JwtTokenProvider(
-            @Value("${app.jwt.secret}") String jwtSecret,
-            @Value("${app.jwt.expiration-ms}") long jwtExpirationMs) {
-        this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+            @Value("${app.jwt.secret}") final String jwtSecret,
+            @Value("${app.jwt.expiration-ms}") final long jwtExpirationMs) {
+        this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.
+            UTF_8));
         this.jwtExpirationMs = jwtExpirationMs;
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param authentication description
+     */
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .sorted((r1, r2) -> {
-                    int w1 = r1.equals("ROLE_ADMIN") ? 3 : r1.equals("ROLE_TECH") ? 2 : 1;
-                    int w2 = r2.equals("ROLE_ADMIN") ? 3 : r2.equals("ROLE_TECH") ? 2 : 1;
+                    int w1 = r1.equals("ROLE_ADMIN") ? 3 : r1.equals(
+                        "ROLE_TECH") ? 2 : 1;
+                    int w2 = r2.equals("ROLE_ADMIN") ? 3 : r2.equals(
+                        "ROLE_TECH") ? 2 : 1;
                     return Integer.compare(w2, w1);
                 })
                 .findFirst()
@@ -51,6 +70,11 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param token description
+     */
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
@@ -60,6 +84,11 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param token description
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parserBuilder()

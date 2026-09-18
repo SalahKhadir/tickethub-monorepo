@@ -16,19 +16,38 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+    /**
+     * Javadoc.
+     */
     private final AuthService authService;
 
+    /**
+     * Javadoc.
+      * @param authService description
+     */
     public AuthController(AuthService authService) {
         this.authService = authService;
     }
 
+    /**
+     * Javadoc.
+      * @param loginRequest description
+      * @return description
+     */
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest
+        loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
+    /**
+     * Javadoc.
+      * @param registerRequest description
+      * @return description
+     */
     @PostMapping("/register")
-    public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<RegistrationResponse> register(@Valid @RequestBody
+        final RegisterRequest registerRequest) {
         authService.registerClient(registerRequest);
         RegistrationResponse response = new RegistrationResponse(
                 "Registration successful. Your account is pending admin approval.",

@@ -10,6 +10,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 public class TickethubApplication {
 
+    /**
+     * Javadoc.
+      * @param args description
+     */
     public static void main(String[] args) {
         SpringApplication.run(TickethubApplication.class, args);
     }

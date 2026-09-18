@@ -20,48 +20,90 @@ import com.tickethub.service.UserService;
 @RestController
 @RequestMapping("/api")
 public class UserController {
+    /**
+     * Javadoc.
+     */
     private final UserRepository userRepository;
+    /**
+     * Javadoc.
+     */
     private final com.tickethub.repository.TicketRepository ticketRepository;
+    /**
+     * Javadoc.
+      * @param userRepository description
+     */
     private final UserService userService;
 
-    public UserController(UserRepository userRepository, com.tickethub.repository.TicketRepository ticketRepository, UserService userService) {
+    /**
+     * Javadoc.
+      * @param ticketRepository description
+      * @param userService description
+     */
+    public UserController(UserRepository userRepository, com.tickethub.
+        repository.TicketRepository ticketRepository, UserService userService) {
         this.userRepository = userRepository;
         this.ticketRepository = ticketRepository;
         this.userService = userService;
     }
 
+    /**
+     * Javadoc.
+      * @return description
+     */
     @GetMapping("/technicians")
     @PreAuthorize("hasAnyRole('TECH','ADMIN')")
     public ResponseEntity<List<TechnicianResponse>> getTechnicians() {
-        return ResponseEntity.ok(toTechnicianResponses(userRepository.findByRole(Role.ROLE_TECH)));
+        return ResponseEntity.ok(toTechnicianResponses(userRepository.
+            findByRole(Role.ROLE_TECH)));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+     */
     @GetMapping("/users/technicians")
     @PreAuthorize("hasAnyRole('TECH','ADMIN')")
     public ResponseEntity<List<TechnicianResponse>> getTechniciansAlias() {
         return getTechnicians();
     }
 
+    /**
+     * Javadoc.
+      * @return description
+     */
     @GetMapping("/technicians/availability")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<com.tickethub.dto.response.TechnicianAvailabilityResponse>> getTechniciansAvailability() {
+    public ResponseEntity<List<com.tickethub.dto.response.
+        TechnicianAvailabilityResponse>> getTechniciansAvailability() {
         return ResponseEntity.ok(userService.getTechniciansAvailability());
     }
 
+    /**
+     * Javadoc.
+      * @return description
+     */
     @GetMapping("/admin/technicians")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<TechnicianResponse>> getTechniciansAdmin() {
         return getTechnicians();
     }
 
+    /**
+     * Javadoc.
+      * @param role description
+      * @return description
+     */
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TechnicianResponse>> getUsers(@RequestParam(required = false) String role) {
+    public ResponseEntity<List<TechnicianResponse>> getUsers(@RequestParam(
+        required = false) String role) {
         if (role == null || role.isBlank()) {
-            return ResponseEntity.ok(toTechnicianResponses(userRepository.findAll()));
+            return ResponseEntity.ok(toTechnicianResponses(userRepository.
+                findAll()));
         }
         Role parsedRole = parseRole(role);
-        return ResponseEntity.ok(toTechnicianResponses(userRepository.findByRole(parsedRole)));
+        return ResponseEntity.ok(toTechnicianResponses(userRepository.
+            findByRole(parsedRole)));
     }
 
     // This method is commented out because it conflicts with AdminUserController's @GetMapping
@@ -71,13 +113,13 @@ public class UserController {
     //     return getUsers(role);
     // }
 
-    private List<TechnicianResponse> toTechnicianResponses(List<User> users) {
+    private List<TechnicianResponse> toTechnicianResponses(final List<User> users) {
         return users.stream()
                 .map(this::toTechnicianResponse)
                 .collect(Collectors.toList());
     }
 
-    private TechnicianResponse toTechnicianResponse(User user) {
+    private TechnicianResponse toTechnicianResponse(final User user) {
         String fullName = Stream.of(user.getPrenom(), user.getNom())
                 .filter(value -> value != null && !value.isBlank())
                 .collect(Collectors.joining(" "));
@@ -87,7 +129,7 @@ public class UserController {
         return new TechnicianResponse(user.getId(), user.getEmail(), fullName);
     }
 
-    private Role parseRole(String roleValue) {
+    private Role parseRole(final String roleValue) {
         String normalized = roleValue.trim().toUpperCase(Locale.ROOT);
         if (normalized.equals("TECHNICIAN") || normalized.equals("TECH")) {
             normalized = "ROLE_TECH";

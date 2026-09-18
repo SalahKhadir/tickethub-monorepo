@@ -31,64 +31,105 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @Builder
 public class Ticket {
+    /**
+     * Javadoc.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Javadoc.
+     */
     @Column(nullable = false, length = 200)
     private String title;
 
+    /**
+     * Javadoc.
+     */
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    /**
+     * Javadoc.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private TicketStatus status;
 
+    /**
+     * Javadoc.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Priority priority;
 
+    /**
+     * Javadoc.
+     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private TicketCategory category;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    /**
+     * Javadoc.
+     */
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "sla_deadline")
     private LocalDateTime slaDeadline;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "solution", columnDefinition = "TEXT")
     private String solution;
 
     /*
      * COMPARAISON: J2EE CLASSIQUE vs SPRING DATA JPA (Relations)
-     * 
+     *
      * Approche sans Spring :
-     * Gestion manuelle des clés étrangères en SQL. Pour récupérer un ticket avec
+     * Gestion manuelle des clés étrangères en SQL. Pour récupérer un ticket
+         avec
      * son
      * auteur, il faudrait faire une jointure manuelle (JOIN) et reconstruire
      * l'arborescence
      * des objets en Java.
-     * 
+     *
      * Différence :
-     * JPA gère les relations via des annotations et automatise le chargement des
+     * JPA gère les relations via des annotations et automatise le chargement
+         des
      * objets
      * liés (Lazy/Eager loading).
+     */
+    /**
+     * Javadoc.
      */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "author_id", nullable = false)
     private User author;
 
+    /**
+     * Javadoc.
+     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assigned_technician_id")
     private User assignedTechnician;
 
+    /**
+     * Javadoc.
+     */
     @PrePersist
     public void prePersist() {
         if (status == null) {

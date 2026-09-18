@@ -12,9 +12,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer {
+    /**
+     * Javadoc.
+      * @param passwordEncoder description
+      * @param userRepository description
+     */
     @Bean
     @Profile("local")
-    public CommandLineRunner seedDefaultUser(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public CommandLineRunner seedDefaultUser(final UserRepository userRepository,
+        PasswordEncoder passwordEncoder) {
         return args -> {
             if (!userRepository.existsByEmail("client@tickethub.local")) {
                 User clientUser = new User();

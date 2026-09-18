@@ -13,27 +13,45 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
+    /**
+     * Javadoc.
+     */
     @NotBlank
     @Size(max = 100)
     private String nom;
 
+    /**
+     * Javadoc.
+     */
     @NotBlank
     @Size(max = 100)
     private String prenom;
 
+    /**
+     * Javadoc.
+     */
     @NotBlank
     @Size(max = 30)
     private String tel;
 
+    /**
+     * Javadoc.
+     */
     @NotBlank
     @Email
     @Size(max = 150)
     private String email;
 
+    /**
+     * Javadoc.
+     */
     @NotBlank
     @Size(min = 8, max = 100)
     private String password;
 
+    /**
+     * Javadoc.
+     */
     @NotBlank
     @Size(min = 8, max = 100)
     private String retypePassword;

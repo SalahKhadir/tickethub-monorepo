@@ -17,78 +17,139 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+      * @param ex description
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleValidationException(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request) {
+            final MethodArgumentNotValidException ex,
+            final HttpServletRequest request) {
         String message = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
                 .map(this::formatFieldError)
                 .collect(Collectors.joining("; "));
 
-        return buildResponse(HttpStatus.BAD_REQUEST, message, request.getRequestURI());
+        return buildResponse(HttpStatus.BAD_REQUEST, message, request.
+            getRequestURI());
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+      * @param ex description
+     */
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFoundException(
-            ResourceNotFoundException ex,
-            HttpServletRequest request) {
-        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+            final ResourceNotFoundException ex,
+            final HttpServletRequest request) {
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.
+            getRequestURI());
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+      * @param ex description
+     */
     @ExceptionHandler(ForbiddenOperationException.class)
     public ResponseEntity<ApiErrorResponse> handleForbiddenException(
-            ForbiddenOperationException ex,
-            HttpServletRequest request) {
-        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request.getRequestURI());
+            final ForbiddenOperationException ex,
+            final HttpServletRequest request) {
+        return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request.
+            getRequestURI());
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param ex description
+     */
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArg(IllegalArgumentException ex) {
+    public ResponseEntity<Map<String, String>> handleIllegalArg(
+        IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of("message", ex.getMessage()));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param ex description
+     */
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalState(IllegalStateException ex) {
+    public ResponseEntity<Map<String, String>> handleIllegalState(
+        IllegalStateException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(Map.of("message", ex.getMessage()));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+      * @param ex description
+     */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiErrorResponse> handleGenericException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ApiErrorResponse> handleGenericException(final Exception ex,
+        HttpServletRequest request) {
         if (request.getRequestURI().contains("/subscribe")) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
+                build();
         }
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.", request.getRequestURI());
     }
 
+    /**
+     * Javadoc.
+      * @param request description
+      * @param ex description
+     */
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<?> handleResponseStatus(ResponseStatusException ex, HttpServletRequest request) {
+    public ResponseEntity<?> handleResponseStatus(final ResponseStatusException ex,
+        HttpServletRequest request) {
         if (request.getRequestURI().contains("/subscribe")) {
             return ResponseEntity.status(ex.getStatusCode()).build();
         }
-        return buildResponse(HttpStatus.valueOf(ex.getStatusCode().value()), ex.getReason(), request.getRequestURI());
+        return buildResponse(HttpStatus.valueOf(ex.getStatusCode().value()), ex.
+            getReason(), request.getRequestURI());
     }
 
+    /**
+     * Javadoc.
+      * @param ex description
+      * @return description
+     */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, String>> handleDataIntegrity(DataIntegrityViolationException ex) {
+    public ResponseEntity<Map<String, String>> handleDataIntegrity(
+        DataIntegrityViolationException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(Map.of("message", "Cannot delete this ticket because it has related records. " + ex.getMostSpecificCause().getMessage()));
     }
 
+    /**
+     * Javadoc.
+      * @param ex description
+      * @return description
+     */
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<Map<String, String>> handleAccessDenied(AccessDeniedException ex) {
+    public ResponseEntity<Map<String, String>> handleAccessDenied(
+        AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
             .body(Map.of("message", ex.getMessage()));
     }
 
-    private String formatFieldError(FieldError fieldError) {
+    private String formatFieldError(final FieldError fieldError) {
         return fieldError.getField() + ": " + fieldError.getDefaultMessage();
     }
 
-    private ResponseEntity<ApiErrorResponse> buildResponse(HttpStatus status, String message, String path) {
+    private ResponseEntity<ApiErrorResponse> buildResponse(final HttpStatus status,
+        String message, String path) {
         ApiErrorResponse body = new ApiErrorResponse(
                 LocalDateTime.now(),
                 status.value(),

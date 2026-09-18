@@ -21,11 +21,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class NotificationPushService {
 
+    /**
+     * Javadoc.
+     */
     private final UserRepository userRepository;
 
     // Store active emitters by user email
+    /**
+     * Javadoc.
+     */
     private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param email description
+     */
     public SseEmitter subscribe(String email) {
         // Force complete existing emitter if a new connection comes in
         if (emitters.containsKey(email)) {
@@ -69,6 +80,11 @@ public class NotificationPushService {
         return emitter;
     }
 
+    /**
+     * Javadoc.
+      * @param email description
+      * @param ticket description
+     */
     public void push(String email, TicketResponse ticket) {
         System.out.println("DEBUG: Pushing to " + email);
         SseEmitter emitter = emitters.get(email);
@@ -87,9 +103,14 @@ public class NotificationPushService {
         }
     }
 
+    /**
+     * Javadoc.
+      * @param ticket description
+     */
     public void broadcastToAdmins(TicketResponse ticket) {
         List<User> admins = userRepository.findByRole(Role.ROLE_ADMIN);
-        Set<String> adminEmails = admins.stream().map(User::getEmail).collect(Collectors.toSet());
+        Set<String> adminEmails = admins.stream().map(User::getEmail).collect(
+            Collectors.toSet());
 
         emitters.forEach((email, emitter) -> {
             if (adminEmails.contains(email)) {
@@ -100,13 +121,17 @@ public class NotificationPushService {
                             .data(ticket));
                     log.info("Pushed notification to admin: {}", email);
                 } catch (IOException e) {
-                    log.debug("Cleaning up dead connection for admin: {}", email);
+                    log.debug("Cleaning up dead connection for admin: {}",
+                        email);
                     emitters.remove(email);
                 }
             }
         });
     }
 
+    /**
+     * Javadoc.
+     */
     @Scheduled(fixedRate = 15000) // Every 15 seconds
     public void sendHeartbeat() {
         emitters.forEach((email, emitter) -> {

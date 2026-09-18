@@ -5,10 +5,6 @@ import com.tickethub.dto.request.AssignRequest;
 import com.tickethub.dto.request.TicketStatusUpdateRequest;
 import com.tickethub.dto.request.TicketUpdateRequest;
 import com.tickethub.dto.response.TicketResponse;
-import com.tickethub.dto.response.TechnicianStatsResponse;
-import com.tickethub.model.Priority;
-import com.tickethub.model.TicketCategory;
-import com.tickethub.model.TicketStatus;
 import com.tickethub.service.TicketService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,60 +31,112 @@ import java.security.Principal;
 @RequestMapping("/api/tickets")
 @RequiredArgsConstructor
 public class TicketController {
+    /**
+     * Javadoc.
+      * @return description
+     */
     private final TicketService ticketService;
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+     */
     @PostMapping
     @PreAuthorize("hasAnyRole('CLIENT','TECH','ADMIN')")
-    public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.createTicket(request));
+    public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody
+        TicketRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(ticketService.
+            createTicket(request));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param pageable description
+      * @param category description
+      * @param priority description
+      * @param status description
+     */
     @GetMapping
     @PreAuthorize("hasAnyRole('CLIENT','TECH','ADMIN')")
     @CrossOrigin(origins = "http://localhost:3000")
     public ResponseEntity<Page<TicketResponse>> getAllTickets(
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String priority,
-            @RequestParam(required = false) String category,
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC)
+            @RequestParam(required = false) final String status,
+            @RequestParam(required = false) final String priority,
+            @RequestParam(required = false) final String category,
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.
+                DESC)
             Pageable pageable) {
-        return ResponseEntity.ok(ticketService.getAllTickets(pageable, status, priority, category));
+        return ResponseEntity.ok(ticketService.getAllTickets(pageable, status,
+            priority, category));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param principal description
+     */
     @GetMapping("/stats")
     @PreAuthorize("hasAnyRole('TECH','ADMIN')")
-    public ResponseEntity<com.tickethub.dto.response.TechnicianStatsResponse> getTechnicianStats(Principal principal) {
-        return ResponseEntity.ok(ticketService.getTechnicianStats(principal.getName()));
+    public ResponseEntity<com.tickethub.dto.response.TechnicianStatsResponse>
+        getTechnicianStats(Principal principal) {
+        return ResponseEntity.ok(ticketService.getTechnicianStats(principal.
+            getName()));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+      * @param id description
+     */
     @PatchMapping("/{id}/status")
     @PreAuthorize("hasAnyRole('TECH','ADMIN')")
     public ResponseEntity<TicketResponse> updateTicketStatus(
-            @PathVariable Long id,
-            @Valid @RequestBody TicketStatusUpdateRequest request) {
-        return ResponseEntity.ok(ticketService.updateTicketStatus(id, request.newStatus(), request.solution()));
+            @PathVariable final Long id,
+            @Valid @RequestBody final TicketStatusUpdateRequest request) {
+        return ResponseEntity.ok(ticketService.updateTicketStatus(id, request.
+            newStatus(), request.solution()));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param request description
+      * @param id description
+     */
     @PatchMapping("/{id}/assign")
     @PreAuthorize("hasAnyRole('TECH','ADMIN')")
     public ResponseEntity<TicketResponse> assignTechnician(
-            @PathVariable Long id,
-            @Valid @RequestBody AssignRequest request) {
-        return ResponseEntity.ok(ticketService.assignTechnician(id, request.techId()));
+            @PathVariable final Long id,
+            @Valid @RequestBody final AssignRequest request) {
+        return ResponseEntity.ok(ticketService.assignTechnician(id, request.
+            techId()));
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param id description
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
-    public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTicket(@PathVariable final Long id) {
         ticketService.deleteTicket(id);
         return ResponseEntity.noContent().build();
     }
 
+    /**
+     * Javadoc.
+      * @param request description
+      * @param id description
+     */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")
     public ResponseEntity<TicketResponse> updateTicket(
-            @PathVariable Long id,
-            @RequestBody TicketUpdateRequest request) {
+            @PathVariable final Long id,
+            @RequestBody final TicketUpdateRequest request) {
         return ResponseEntity.ok(ticketService.updateTicket(id, request));
     }
 }

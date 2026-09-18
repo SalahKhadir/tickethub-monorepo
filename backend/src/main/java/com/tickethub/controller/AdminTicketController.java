@@ -17,14 +17,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/admin/tickets")
 @RequiredArgsConstructor
 public class AdminTicketController {
+    /**
+     * Javadoc.
+      * @return description
+     */
     private final TicketService ticketService;
 
+    /**
+     * Javadoc.
+      * @param request description
+      * @param id description
+     */
     @PatchMapping("/{id}/assign")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TicketResponse> assignTechnician(
-            @PathVariable Long id,
-            @Valid @RequestBody AssignRequest request) {
-        return ResponseEntity.ok(ticketService.assignTechnician(id, request.techId()));
+            @PathVariable final Long id,
+            @Valid @RequestBody final AssignRequest request) {
+        return ResponseEntity.ok(ticketService.assignTechnician(id, request.
+            techId()));
     }
 }
 

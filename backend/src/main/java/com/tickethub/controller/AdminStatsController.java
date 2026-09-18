@@ -14,8 +14,15 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 @RequestMapping("/api/admin/stats")
 @RequiredArgsConstructor
 public class AdminStatsController {
+    /**
+     * Javadoc.
+     */
     private final TicketService ticketService;
 
+    /**
+     * Javadoc.
+      * @return description
+     */
     @GetMapping("/global")
     @PreAuthorize("hasRole('ADMIN')")
     @CrossOrigin(origins = "http://localhost:3000")

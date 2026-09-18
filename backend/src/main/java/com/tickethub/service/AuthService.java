@@ -18,22 +18,46 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+    /**
+     * Javadoc.
+     */
     private final AuthenticationManager authenticationManager;
+    /**
+     * Javadoc.
+     */
     private final JwtTokenProvider jwtTokenProvider;
+    /**
+     * Javadoc.
+     */
     private final UserRepository userRepository;
+    /**
+     * Javadoc.
+      * @param authenticationManager description
+     */
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Javadoc.
+      * @param passwordEncoder description
+      * @param userRepository description
+      * @param jwtTokenProvider description
+     */
     public AuthService(
-            AuthenticationManager authenticationManager,
-            JwtTokenProvider jwtTokenProvider,
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder) {
+            final AuthenticationManager authenticationManager,
+            final JwtTokenProvider jwtTokenProvider,
+            final UserRepository userRepository,
+            final PasswordEncoder passwordEncoder) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Javadoc.
+      * @return description
+      * @param loginRequest description
+     */
     public JwtResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -46,15 +70,21 @@ public class AuthService {
                 .map(authority -> authority.getAuthority())
                 .toList();
 
-        return new JwtResponse(token, "Bearer", authentication.getName(), roles);
+        return new JwtResponse(token, "Bearer", authentication.getName(),
+            roles);
     }
 
+    /**
+     * Javadoc.
+      * @param registerRequest description
+     */
     public void registerClient(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new IllegalArgumentException("Email is already taken.");
         }
 
-        if (!registerRequest.getPassword().equals(registerRequest.getRetypePassword())) {
+        if (!registerRequest.getPassword().equals(registerRequest.
+            getRetypePassword())) {
             throw new IllegalArgumentException("Passwords do not match.");
         }
 

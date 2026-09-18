@@ -31,34 +31,62 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
+    /**
+     * Javadoc.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    /**
+     * Javadoc.
+     */
     @Column(nullable = false)
     private String password;
 
+    /**
+     * Javadoc.
+     */
     @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name =
+        "user_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Set<Role> roles = new HashSet<>();
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "nom")
     private String nom;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "prenom")
     private String prenom;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "tel")
     private String tel;
 
+    /**
+     * Javadoc.
+     */
     @Column(name = "enabled", nullable = false)
     private boolean enabled = false;
 
+    /**
+     * Javadoc.
+     */
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

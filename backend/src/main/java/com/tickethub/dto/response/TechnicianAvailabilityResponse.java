@@ -8,10 +8,28 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TechnicianAvailabilityResponse {
+    /**
+     * Javadoc.
+     */
     private Long id;
+    /**
+     * Javadoc.
+     */
     private String nom;
+    /**
+     * Javadoc.
+     */
     private String prenom;
+    /**
+     * Javadoc.
+     */
     private String email;
+    /**
+     * Javadoc.
+     */
     private String fullName;
+    /**
+     * Javadoc.
+     */
     private long activeTicketsCount;
 }
