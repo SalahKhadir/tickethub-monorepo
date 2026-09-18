@@ -53,12 +53,12 @@ public class UserService {
      * @param passwordEncoder encoder used for user passwords
      */
     public UserService(
-            final UserRepository userRepository,
-            final TicketRepository ticketRepository,
-            final PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.ticketRepository = ticketRepository;
-        this.passwordEncoder = passwordEncoder;
+            final UserRepository pUserRepository,
+            final TicketRepository pTicketRepository,
+            final PasswordEncoder pPasswordEncoder) {
+        this.userRepository = pUserRepository;
+        this.ticketRepository = pTicketRepository;
+        this.passwordEncoder = pPasswordEncoder;
     }
 
     /**
@@ -131,7 +131,8 @@ public class UserService {
     @Transactional
     public void approveUser(final Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "User not found: " + userId));
         user.setEnabled(true);
         userRepository.save(user);
     }
@@ -189,9 +190,11 @@ public class UserService {
                 .map(Role::name)
                 .sorted((r1, r2) -> {
                     int w1 = r1.equals("ROLE_ADMIN") ? ADMIN_ROLE_WEIGHT : r1.
-                        equals("ROLE_TECH") ? TECH_ROLE_WEIGHT : CLIENT_ROLE_WEIGHT;
+                        equals(
+                                "ROLE_TECH") ? TECH_ROLE_WEIGHT : CLIENT_ROLE_WEIGHT;
                     int w2 = r2.equals("ROLE_ADMIN") ? ADMIN_ROLE_WEIGHT : r2.
-                        equals("ROLE_TECH") ? TECH_ROLE_WEIGHT : CLIENT_ROLE_WEIGHT;
+                        equals(
+                                "ROLE_TECH") ? TECH_ROLE_WEIGHT : CLIENT_ROLE_WEIGHT;
                     return Integer.compare(w2, w1);
                 })
                 .findFirst()

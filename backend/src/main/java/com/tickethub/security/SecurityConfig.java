@@ -69,8 +69,9 @@ public class SecurityConfig {
      * Javadoc.
       * @param jwtAuthenticationFilter description
      */
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    public SecurityConfig(
+            final JwtAuthenticationFilter pJwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = pJwtAuthenticationFilter;
     }
 
     /**
@@ -79,7 +80,8 @@ public class SecurityConfig {
       * @return description
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws
+    public SecurityFilterChain securityFilterChain(
+            final HttpSecurity http) throws
         Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -90,13 +92,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.
-                            GET, "/api/tickets").hasAnyRole("CLIENT", "TECH", "ADMIN")
+                            GET, "/api/tickets").hasAnyRole("CLIENT", "TECH",
+                                    "ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.
-                            POST, "/api/tickets").hasAnyRole("CLIENT", "TECH", "ADMIN")
+                            POST, "/api/tickets").hasAnyRole("CLIENT", "TECH",
+                                    "ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.
-                            PATCH, "/api/tickets/*/status").hasAnyRole("TECH", "ADMIN")
+                            PATCH, "/api/tickets/*/status").hasAnyRole("TECH",
+                                    "ADMIN")
                         .requestMatchers(org.springframework.http.HttpMethod.
-                            PATCH, "/api/tickets/*/assign").hasAnyRole("TECH", "ADMIN")
+                            PATCH, "/api/tickets/*/assign").hasAnyRole("TECH",
+                                    "ADMIN")
                         .requestMatchers("/api/tickets/**").hasAnyRole("CLIENT",
                             "TECH", "ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
@@ -116,7 +122,7 @@ public class SecurityConfig {
      */
     @Bean
     public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration authenticationConfiguration)
+        final AuthenticationConfiguration authenticationConfiguration)
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }

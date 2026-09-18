@@ -13,25 +13,30 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
+    private static final int MAX_STRING_LENGTH = 100;
+    private static final int MAX_EMAIL_LENGTH = 150;
+    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final int MAX_TEL_LENGTH = 30;
+
     /**
      * Javadoc.
      */
     @NotBlank
-    @Size(max = 100)
+    @Size(max = MAX_STRING_LENGTH)
     private String nom;
 
     /**
      * Javadoc.
      */
     @NotBlank
-    @Size(max = 100)
+    @Size(max = MAX_STRING_LENGTH)
     private String prenom;
 
     /**
      * Javadoc.
      */
     @NotBlank
-    @Size(max = 30)
+    @Size(max = MAX_TEL_LENGTH)
     private String tel;
 
     /**
@@ -39,21 +44,21 @@ public class RegisterRequest {
      */
     @NotBlank
     @Email
-    @Size(max = 150)
+    @Size(max = MAX_EMAIL_LENGTH)
     private String email;
 
     /**
      * Javadoc.
      */
     @NotBlank
-    @Size(min = 8, max = 100)
+    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_STRING_LENGTH)
     private String password;
 
     /**
      * Javadoc.
      */
     @NotBlank
-    @Size(min = 8, max = 100)
+    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_STRING_LENGTH)
     private String retypePassword;
 }
 

@@ -31,6 +31,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @Builder
 public class Ticket {
+    private static final int MAX_TITLE_LENGTH = 200;
+    private static final int MAX_ENUM_LENGTH = 20;
     /**
      * Javadoc.
      */
@@ -41,7 +43,7 @@ public class Ticket {
     /**
      * Javadoc.
      */
-    @Column(nullable = false, length = 200)
+    @Column(nullable = false, length = MAX_TITLE_LENGTH)
     private String title;
 
     /**
@@ -54,21 +56,21 @@ public class Ticket {
      * Javadoc.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = MAX_ENUM_LENGTH)
     private TicketStatus status;
 
     /**
      * Javadoc.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = MAX_ENUM_LENGTH)
     private Priority priority;
 
     /**
      * Javadoc.
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(nullable = false, length = MAX_ENUM_LENGTH)
     private TicketCategory category;
 
     /**

@@ -39,11 +39,12 @@ public class UserController {
       * @param ticketRepository description
       * @param userService description
      */
-    public UserController(UserRepository userRepository, com.tickethub.
-        repository.TicketRepository ticketRepository, UserService userService) {
-        this.userRepository = userRepository;
-        this.ticketRepository = ticketRepository;
-        this.userService = userService;
+    public UserController(final UserRepository pUserRepository,
+            final com.tickethub.repository.TicketRepository pTicketRepository,
+                    final UserService pUserService) {
+        this.userRepository = pUserRepository;
+        this.ticketRepository = pTicketRepository;
+        this.userService = pUserService;
     }
 
     /**
@@ -113,7 +114,8 @@ public class UserController {
     //     return getUsers(role);
     // }
 
-    private List<TechnicianResponse> toTechnicianResponses(final List<User> users) {
+    private List<TechnicianResponse> toTechnicianResponses(
+            final List<User> users) {
         return users.stream()
                 .map(this::toTechnicianResponse)
                 .collect(Collectors.toList());

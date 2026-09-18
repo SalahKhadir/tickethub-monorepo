@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 public record TicketRequest(
         @NotBlank
-        @Size(max = 200)
+        @Size(max = MAX_TITLE_LENGTH)
         String title,
 
         @NotBlank

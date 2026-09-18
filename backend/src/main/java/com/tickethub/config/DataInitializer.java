@@ -20,7 +20,7 @@ public class DataInitializer {
     @Bean
     @Profile("local")
     public CommandLineRunner seedDefaultUser(final UserRepository userRepository,
-        PasswordEncoder passwordEncoder) {
+        final PasswordEncoder passwordEncoder) {
         return args -> {
             if (!userRepository.existsByEmail("client@tickethub.local")) {
                 User clientUser = new User();

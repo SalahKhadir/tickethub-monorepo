@@ -10,30 +10,40 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     /**
-     * Javadoc.
-      * @return description
-      * @param email description
+     * Finds a user by their email address.
+     *
+     * @param email the email address to search for
+     * @return an Optional containing the found user, or empty if not found
      */
     Optional<User> findByEmail(String email);
 
     /**
-     * Javadoc.
-      * @return description
-      * @param email description
+     * Checks if a user exists with the given email address.
+     *
+     * @param email the email address to check
+     * @return true if a user with the email exists, false otherwise
      */
     boolean existsByEmail(String email);
 
     /**
-     * Javadoc.
-      * @return description
+     * Finds all users whose accounts are disabled (enabled = false).
+     *
+     * @return a list of pending/disabled users
      */
     List<User> findAllByEnabledFalse();
 
     /**
-     * Javadoc.
-      * @param role description
-      * @return description
+     * Finds all enabled users having a specific role.
+     *
+     * @param role the role to filter by
+     * @return a list of matching enabled users
      */
-    @Query("select distinct u from User u join u.roles r where r = :role and u.enabled = true")
+    @Query("""
+           SELECT DISTINCT u
+           FROM User u
+           JOIN u.roles r
+           WHERE r = :role
+             AND u.enabled = true
+           """)
     List<User> findByRole(@Param("role") Role role);
 }

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
+    private static final int TOKEN_SUBSTRING_START = 3;
+
     /**
      * Javadoc.
      */
@@ -32,10 +34,10 @@ public class JwtTokenProvider {
      */
     public JwtTokenProvider(
             @Value("${app.jwt.secret}") final String jwtSecret,
-            @Value("${app.jwt.expiration-ms}") final long jwtExpirationMs) {
+            @Value("${app.jwt.expiration-ms}") final long pJwtExpirationMs) {
         this.secretKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.
             UTF_8));
-        this.jwtExpirationMs = jwtExpirationMs;
+        this.jwtExpirationMs = pJwtExpirationMs;
     }
 
     /**
@@ -43,7 +45,7 @@ public class JwtTokenProvider {
       * @return description
       * @param authentication description
      */
-    public String generateToken(Authentication authentication) {
+    public String generateToken(final Authentication authentication) {
         String username = authentication.getName();
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -75,7 +77,7 @@ public class JwtTokenProvider {
       * @return description
       * @param token description
      */
-    public String getUsernameFromToken(String token) {
+    public String getUsernameFromToken(final String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -89,7 +91,7 @@ public class JwtTokenProvider {
       * @return description
       * @param token description
      */
-    public boolean validateToken(String token) {
+    public boolean validateToken(final String token) {
         try {
             Jwts.parserBuilder()
                     .setSigningKey(secretKey)

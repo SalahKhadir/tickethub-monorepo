@@ -43,14 +43,14 @@ public class AuthService {
       * @param jwtTokenProvider description
      */
     public AuthService(
-            final AuthenticationManager authenticationManager,
-            final JwtTokenProvider jwtTokenProvider,
-            final UserRepository userRepository,
-            final PasswordEncoder passwordEncoder) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+            final AuthenticationManager pAuthenticationManager,
+            final JwtTokenProvider pJwtTokenProvider,
+            final UserRepository pUserRepository,
+            final PasswordEncoder pPasswordEncoder) {
+        this.authenticationManager = pAuthenticationManager;
+        this.jwtTokenProvider = pJwtTokenProvider;
+        this.userRepository = pUserRepository;
+        this.passwordEncoder = pPasswordEncoder;
     }
 
     /**
@@ -58,7 +58,7 @@ public class AuthService {
       * @return description
       * @param loginRequest description
      */
-    public JwtResponse login(LoginRequest loginRequest) {
+    public JwtResponse login(final LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -78,7 +78,7 @@ public class AuthService {
      * Javadoc.
       * @param registerRequest description
      */
-    public void registerClient(RegisterRequest registerRequest) {
+    public void registerClient(final RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new IllegalArgumentException("Email is already taken.");
         }

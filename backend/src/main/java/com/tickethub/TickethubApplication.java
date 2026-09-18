@@ -8,13 +8,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 
-public class TickethubApplication {
+public final class TickethubApplication {
+
+    private TickethubApplication() {
+        // Utility class
+    }
 
     /**
      * Javadoc.
       * @param args description
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(TickethubApplication.class, args);
     }
 

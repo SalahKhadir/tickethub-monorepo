@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationPushService {
+    private static final int NOTIFICATION_TIMEOUT_MS = 15000;
+
 
     /**
      * Javadoc.
@@ -37,7 +39,7 @@ public class NotificationPushService {
       * @return description
       * @param email description
      */
-    public SseEmitter subscribe(String email) {
+    public SseEmitter subscribe(final String email) {
         // Force complete existing emitter if a new connection comes in
         if (emitters.containsKey(email)) {
             try {
@@ -85,7 +87,7 @@ public class NotificationPushService {
       * @param email description
       * @param ticket description
      */
-    public void push(String email, TicketResponse ticket) {
+    public void push(final String email, final TicketResponse ticket) {
         System.out.println("DEBUG: Pushing to " + email);
         SseEmitter emitter = emitters.get(email);
         if (emitter != null) {
@@ -107,7 +109,7 @@ public class NotificationPushService {
      * Javadoc.
       * @param ticket description
      */
-    public void broadcastToAdmins(TicketResponse ticket) {
+    public void broadcastToAdmins(final TicketResponse ticket) {
         List<User> admins = userRepository.findByRole(Role.ROLE_ADMIN);
         Set<String> adminEmails = admins.stream().map(User::getEmail).collect(
             Collectors.toSet());

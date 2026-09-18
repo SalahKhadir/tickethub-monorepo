@@ -48,7 +48,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
  *   automatisant la vérification salt + hash sécurisée, sans exposer les mots
      de passe.
  */
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public final class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final int BEARER_PREFIX_LENGTH = 7;
+
     /**
      * Javadoc.
      */
@@ -63,10 +65,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       * @param userDetailsService description
       * @param jwtTokenProvider description
      */
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider,
-        CustomUserDetailsService userDetailsService) {
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.userDetailsService = userDetailsService;
+    public JwtAuthenticationFilter(final JwtTokenProvider pJwtTokenProvider,
+        final CustomUserDetailsService pUserDetailsService) {
+        this.jwtTokenProvider = pJwtTokenProvider;
+        this.userDetailsService = pUserDetailsService;
     }
 
     @Override
@@ -95,7 +97,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String resolveToken(final HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            return bearerToken.substring(BEARER_PREFIX_LENGTH);
         }
         String tokenParam = request.getParameter("token");
         if (tokenParam != null && !tokenParam.isBlank()) {

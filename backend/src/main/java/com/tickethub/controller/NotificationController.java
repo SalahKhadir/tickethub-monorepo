@@ -43,7 +43,7 @@ public class NotificationController {
     @GetMapping(value = "/subscribe", produces = MediaType.
         TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@RequestParam("token") final String token,
-        HttpServletResponse response) {
+        final HttpServletResponse response) {
         System.out.println("SSE Subscription Attempted");
 
         response.setHeader("Cache-Control", "no-store");

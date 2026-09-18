@@ -67,7 +67,7 @@ public class TicketController {
             @RequestParam(required = false) final String category,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.
                 DESC)
-            Pageable pageable) {
+            final Pageable pageable) {
         return ResponseEntity.ok(ticketService.getAllTickets(pageable, status,
             priority, category));
     }
@@ -80,7 +80,7 @@ public class TicketController {
     @GetMapping("/stats")
     @PreAuthorize("hasAnyRole('TECH','ADMIN')")
     public ResponseEntity<com.tickethub.dto.response.TechnicianStatsResponse>
-        getTechnicianStats(Principal principal) {
+        getTechnicianStats(final Principal principal) {
         return ResponseEntity.ok(ticketService.getTechnicianStats(principal.
             getName()));
     }

@@ -25,8 +25,8 @@ public class AuthController {
      * Javadoc.
       * @param authService description
      */
-    public AuthController(AuthService authService) {
-        this.authService = authService;
+    public AuthController(final AuthService pAuthService) {
+        this.authService = pAuthService;
     }
 
     /**

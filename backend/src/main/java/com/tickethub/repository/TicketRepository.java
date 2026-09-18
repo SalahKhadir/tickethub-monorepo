@@ -16,15 +16,12 @@ import java.util.List;
  * COMPARAISON: J2EE CLASSIQUE vs SPRING DATA JPA
  *
  * Approche sans Spring :
- * Utilisation de JDBC pur avec des classes DAO. Écriture de requêtes SQL
-     manuelles
- * (SELECT * FROM tickets...). Gestion des Connection, PreparedStatement et
-     mapping
+ * Utilisation de JDBC pur avec des classes DAO. Écriture de requêtes SQL manuelles
+ * (SELECT * FROM tickets...). Gestion des Connection, PreparedStatement et mapping
  * manuel du ResultSet vers les objets Java.
  *
  * Différence :
- * Spring Data JPA génère les requêtes à partir du nom des méthodes (Query
-     Methods)
+ * Spring Data JPA génère les requêtes à partir du nom des méthodes (Query Methods)
  * ou via @Query en JPQL.
  *
  * Avantage :
@@ -35,35 +32,29 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   /*
    * COMPARAISON PÉDAGOGIQUE: FILTRAGE DYNAMIQUE JDBC vs SPRING DATA JPA
    *
-   * En JDBC classique, la gestion de filtres optionnels (status, priority,
-       category)
-   * aurait nécessité la construction manuelle d'une chaîne SQL dynamique avec
-       des blocs "IF".
+   * En JDBC classique, la gestion de filtres optionnels (status, priority, category)
+   * aurait nécessité la construction manuelle d'une chaîne SQL dynamique avec des blocs "IF".
    * Par exemple :
    *   String sql = "SELECT * FROM tickets WHERE 1=1";
    *   if (status != null) { sql += " AND status = ?"; }
    *   if (priority != null) { sql += " AND priority = ?"; }
    *
-   * Cela augmente drastiquement le risque d'erreurs de syntaxe, l'oubli
-       d'espaces et
-   * nécessite une gestion laborieuse de l'injection des paramètres (
-       PreparedStatement.setDate(i, val)...).
+   * Cela augmente drastiquement le risque d'erreurs de syntaxe, l'oubli d'espaces et
+   * nécessite une gestion laborieuse de l'injection des paramètres (PreparedStatement.setDate(i, val)...).
    *
-   * Grâce à Spring Data JPA (et JPQL/HQL), nous pouvons écrire une clause
-       statique :
+   * Grâce à Spring Data JPA (et JPQL/HQL), nous pouvons écrire une clause statique :
    * "(:param IS NULL OR t.field = :param)"
-   * Hibernate s'occupe de compiler intelligemment la requête et de sécuriser
-       l'injection
+   * Hibernate s'occupe de compiler intelligemment la requête et de sécuriser l'injection
    * SQL automatiquement. Le code reste concis, propre et 100% sécurisé.
-    * @return description
    */
   /**
-   * Javadoc.
-    * @return description
-    * @param pageable description
-    * @param category description
-    * @param priority description
-    * @param statuses description
+   * Finds all tickets with filters.
+   *
+   * @param statuses description
+   * @param priority description
+   * @param category description
+   * @param pageable description
+   * @return description
    */
   @Query("""
       SELECT t
@@ -79,13 +70,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       Pageable pageable);
 
   /**
-   * Javadoc.
-    * @return description
-    * @param pageable description
-    * @param category description
-    * @param priority description
-    * @param statuses description
-    * @param authorId description
+   * Finds tickets by author id with filters.
+   *
+   * @param authorId description
+   * @param statuses description
+   * @param priority description
+   * @param category description
+   * @param pageable description
+   * @return description
    */
   @Query("""
       SELECT t
@@ -103,14 +95,14 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       Pageable pageable);
 
   /**
-   * Javadoc.
-    * @return description
-    * @param techId description
-    * @param pageable description
-    * @param category description
-    * @param priority description
-    * @param statuses description
-    * @param techId description
+   * Finds tickets by assigned technician id with filters.
+   *
+   * @param techId description
+   * @param statuses description
+   * @param priority description
+   * @param category description
+   * @param pageable description
+   * @return description
    */
   @Query("""
       SELECT t
@@ -128,20 +120,23 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       Pageable pageable);
 
   /**
-   * Javadoc.
-    * @return description
-    * @param statuses description
+   * Counts tickets assigned to a technician by status.
+   *
+   * @param techId technician identifier
+   * @param statuses statuses to count
+   * @return number of matching tickets
    */
-  long countByAssignedTechnicianIdAndStatusIn(Long techId, java.util.
-      List<TicketStatus> statuses);
+  long countByAssignedTechnicianIdAndStatusIn(
+      Long techId,
+      java.util.List<TicketStatus> statuses);
 
   /**
-   * Javadoc.
-    * @param email description
-    * @return description
-    * @param excludedStatuses description
-    * @param threshold description
-    * @param now description
+   * Finds tickets nearing SLA.
+   *
+   * @param now description
+   * @param threshold description
+   * @param excludedStatuses description
+   * @return description
    */
   @Query("""
       SELECT t
@@ -155,87 +150,110 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
       @Param("excludedStatuses") java.util.List<TicketStatus> excludedStatuses);
 
   /**
-   * Javadoc.
-    * @return description
-    * @param email description
-    * @param startOfDay description
-    * @param status description
+   * Counts tickets assigned to a technician with a given status on or after
+   * the specified start time.
+   *
+   * @param email technician email
+   * @param status ticket status
+   * @param startOfDay beginning of the reporting period
+   * @return number of matching tickets
    */
-  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.assignedTechnician.email = :email " +
-         "AND t.status = :status AND t.updatedAt >= :startOfDay")
-  long countByTechnicianAndStatusAndDate(@Param("email") String email,
-                                         @Param("status") TicketStatus status,
-                                         @Param("startOfDay") java.time.
-                                             LocalDateTime startOfDay);
+  @Query("""
+         SELECT COUNT(t)
+         FROM Ticket t
+         WHERE t.assignedTechnician.email = :email
+           AND t.status = :status
+           AND t.updatedAt >= :startOfDay
+         """)
+  long countByTechnicianAndStatusAndDate(
+      @Param("email") String email,
+      @Param("status") TicketStatus status,
+      @Param("startOfDay") java.time.LocalDateTime startOfDay);
 
   /**
-   * Javadoc.
-    * @return description
-    * @param email description
-    * @param statuses description
+   * Counts tickets by technician email and statuses.
+   *
+   * @param email description
+   * @param statuses description
+   * @return description
    */
-  long countByAssignedTechnicianEmailAndStatusIn(String email,
+  long countByAssignedTechnicianEmailAndStatusIn(
+      String email,
       List<TicketStatus> statuses);
 
   /**
-   * Javadoc.
-    * @return description
-    * @param email description
-    * @param status description
+   * Counts tickets by technician email and status.
+   *
+   * @param email description
+   * @param status description
+   * @return description
    */
-  long countByAssignedTechnicianEmailAndStatus(String email, TicketStatus
-      status);
+  long countByAssignedTechnicianEmailAndStatus(String email, TicketStatus status);
 
   /**
-   * Javadoc.
-    * @param status description
-    * @param priority description
-    * @param statuses description
+   * Counts tickets by technician email, priority and statuses.
+   *
+   * @param email description
+   * @param priority description
+   * @param statuses description
+   * @return description
    */
-  long countByAssignedTechnicianEmailAndPriorityAndStatusIn(String email,
-      Priority priority, List<TicketStatus> statuses);
+  long countByAssignedTechnicianEmailAndPriorityAndStatusIn(
+      String email,
+      Priority priority,
+      List<TicketStatus> statuses);
 
   /**
-   * Javadoc.
-    * @param statuses description
-    * @return description
+   * Counts tickets by status.
+   *
+   * @param status description
+   * @return description
    */
   long countByStatus(TicketStatus status);
 
   /**
-   * Javadoc.
-    * @param priority description
-    * @return description
+   * Counts tickets by statuses.
+   *
+   * @param statuses description
+   * @return description
    */
   long countByStatusIn(List<TicketStatus> statuses);
 
   /**
-   * Javadoc.
-    * @return description
-    * @return description
+   * Counts tickets by priority.
+   *
+   * @param priority description
+   * @return description
    */
   long countByPriority(Priority priority);
 
   /**
-   * Javadoc.
-    * @param startOfDay description
-    * @param status description
+   * Counts tickets by status and date.
+   *
+   * @param status description
+   * @param startOfDay description
+   * @return description
    */
-  @Query("SELECT COUNT(t) FROM Ticket t WHERE t.status = :status AND t.updatedAt >= :startOfDay")
-  long countByStatusAndDate(@Param("status") TicketStatus status, @Param(
-      "startOfDay") java.time.LocalDateTime startOfDay);
+  @Query("SELECT COUNT(t) FROM Ticket t "
+        + "WHERE t.status = :status "
+        + "AND t.updatedAt >= :startOfDay")
+  long countByStatusAndDate(
+      @Param("status") TicketStatus status,
+      @Param("startOfDay") java.time.LocalDateTime startOfDay);
 
   /**
-   * Javadoc.
-    * @return description
+   * Counts tickets by category.
+   *
+   * @return description
    */
   @Query("SELECT t.category, COUNT(t) FROM Ticket t GROUP BY t.category")
   List<Object[]> countTicketsByCategoryGroup();
 
   /**
-   * Javadoc.
-    * @return description
-    * @param status description
+   * Finds all tickets by status.
+   *
+   * @param status description
+   * @return description
    */
   List<Ticket> findAllByStatus(TicketStatus status);
 }

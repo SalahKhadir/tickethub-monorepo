@@ -199,7 +199,8 @@ public class TicketServiceImpl implements TicketService {
                     category,
                     pageable);
         } else {
-            throw new ForbiddenOperationException("You are not allowed to access tickets.");
+            throw new ForbiddenOperationException(
+                    "You are not allowed to access tickets.");
         }
 
         return tickets.map(this::toResponse);
@@ -221,7 +222,8 @@ public class TicketServiceImpl implements TicketService {
         boolean isAuthor = ticket.getAuthor().getEmail().equalsIgnoreCase(
             authentication.getName());
         if (!isAuthor && !isStaff) {
-            throw new AccessDeniedException("You are not allowed to access this ticket.");
+            throw new AccessDeniedException(
+                    "You are not allowed to access this ticket.");
         }
 
         return toResponse(ticket);
@@ -243,18 +245,22 @@ public class TicketServiceImpl implements TicketService {
         Authentication authentication = getCurrentAuthentication();
 
         if (!hasAnyAuthority(authentication, ADMIN_AUTHORITIES)) {
-            throw new AccessDeniedException("Only ADMIN can assign a technician.");
+            throw new AccessDeniedException(
+                    "Only ADMIN can assign a technician.");
         }
 
         if (ticket.getStatus() != TicketStatus.ACCEPTED) {
-            throw new IllegalStateException("Ticket must be ACCEPTED beforeassigning a technician.");
+            throw new IllegalStateException(
+                    "Ticket must be ACCEPTED beforeassigning a technician.");
         }
 
         User technician = userRepository.findById(techId)
-                .orElseThrow(() -> new ResourceNotFoundException("Techniciannot found: " + techId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Techniciannot found: " + techId));
 
         if (!technician.getRoles().contains(Role.ROLE_TECH)) {
-            throw new IllegalStateException("Assigned user must have roleTECHNICIAN.");
+            throw new IllegalStateException(
+                    "Assigned user must have roleTECHNICIAN.");
         }
 
         ticket.setAssignedTechnician(technician);
@@ -292,12 +298,14 @@ public class TicketServiceImpl implements TicketService {
         if (currentStatus == TicketStatus.NEW && newStatus == TicketStatus.
             ACCEPTED) {
             if (!hasAnyAuthority(authentication, Set.of("ROLE_ADMIN"))) {
-                throw new AccessDeniedException("Only ADMIN can accept a ticket.");
+                throw new AccessDeniedException(
+                        "Only ADMIN can accept a ticket.");
             }
         } else if (currentStatus == TicketStatus.ACCEPTED && newStatus ==
             TicketStatus.IN_PROGRESS) {
             if (!hasAnyAuthority(authentication, Set.of("ROLE_TECH"))) {
-                throw new AccessDeniedException("Only TECH can start work on aticket.");
+                throw new AccessDeniedException(
+                        "Only TECH can start work on aticket.");
             }
             User currentUser = getCurrentUser();
             if (ticket.getAssignedTechnician() == null
@@ -309,7 +317,8 @@ public class TicketServiceImpl implements TicketService {
         } else if (currentStatus == TicketStatus.IN_PROGRESS && newStatus ==
             TicketStatus.RESOLVED) {
             if (!hasAnyAuthority(authentication, Set.of("ROLE_TECH"))) {
-                throw new AccessDeniedException("Only TECH can resolve a ticket.");
+                throw new AccessDeniedException(
+                        "Only TECH can resolve a ticket.");
             }
             User currentUser = getCurrentUser();
             if (ticket.getAssignedTechnician() == null
@@ -319,13 +328,15 @@ public class TicketServiceImpl implements TicketService {
                         "Only the assigned technician can resolve this ticket.");
             }
             if (solution == null || solution.isBlank()) {
-                throw new IllegalArgumentException("Solution is required toresolve a ticket.");
+                throw new IllegalArgumentException(
+                        "Solution is required toresolve a ticket.");
             }
             ticket.setSolution(solution);
         } else if (currentStatus == TicketStatus.RESOLVED && newStatus ==
             TicketStatus.CLOSED) {
             if (!(isClient && isAuthor)) {
-                throw new AccessDeniedException("Only the CLIENT author canclose a ticket.");
+                throw new AccessDeniedException(
+                        "Only the CLIENT author canclose a ticket.");
             }
         } else {
             throw new IllegalStateException(
@@ -368,11 +379,13 @@ public class TicketServiceImpl implements TicketService {
             authentication.getName());
 
         if (!isAuthor && !isStaff) {
-            throw new AccessDeniedException("You are not allowed to delete this ticket.");
+            throw new AccessDeniedException(
+                    "You are not allowed to delete this ticket.");
         }
 
         if (isClient && ticket.getStatus() != TicketStatus.NEW) {
-            throw new AccessDeniedException("A client can only delete a NEW ticket.");
+            throw new AccessDeniedException(
+                    "A client can only delete a NEW ticket.");
         }
 
         // Clear assignment before delete to avoid FK constraint
@@ -400,10 +413,12 @@ public class TicketServiceImpl implements TicketService {
                 .equalsIgnoreCase(authentication.getName());
 
         if (!isAuthor && !isStaff) {
-            throw new AccessDeniedException("You are not allowed to edit thisticket.");
+            throw new AccessDeniedException(
+                    "You are not allowed to edit thisticket.");
         }
         if (isAuthor && !isStaff && ticket.getStatus() != TicketStatus.NEW) {
-            throw new AccessDeniedException("You can only edit a ticket withstatus NEW.");
+            throw new AccessDeniedException(
+                    "You can only edit a ticket withstatus NEW.");
         }
         if (request.title() != null && !request.title().isBlank()) {
             ticket.setTitle(request.title().trim());
@@ -479,7 +494,8 @@ public class TicketServiceImpl implements TicketService {
     public com.tickethub.dto.response.AdminStatsResponse getAdminGlobalStats() {
         Authentication authentication = getCurrentAuthentication();
         if (!hasAnyAuthority(authentication, ADMIN_AUTHORITIES)) {
-            throw new AccessDeniedException("Only ADMIN can view global stats.");
+            throw new AccessDeniedException(
+                    "Only ADMIN can view global stats.");
         }
 
         /*
@@ -547,7 +563,8 @@ public class TicketServiceImpl implements TicketService {
         Authentication authentication = getCurrentAuthentication();
         String email = authentication.getName();
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Authenticated user not found: " + email));
     }
 
     private Authentication getCurrentAuthentication() {
@@ -555,7 +572,8 @@ public class TicketServiceImpl implements TicketService {
             getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() ||
             "anonymousUser".equals(authentication.getName())) {
-            throw new ForbiddenOperationException("Authentication is required.");
+            throw new ForbiddenOperationException(
+                    "Authentication is required.");
         }
         return authentication;
     }
@@ -569,7 +587,8 @@ public class TicketServiceImpl implements TicketService {
 
     private Ticket findTicketByIdOrThrow(final Long id) {
         return ticketRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Ticket not found: " + id));
     }
 
     private TicketResponse toResponse(final Ticket ticket) {
