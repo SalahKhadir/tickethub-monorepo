@@ -6,4 +6,5 @@ public record TicketUpdateRequest(
         String title,
         String description,
         Priority priority
-) {}
+) {
+}

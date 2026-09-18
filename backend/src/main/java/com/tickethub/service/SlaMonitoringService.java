@@ -52,7 +52,8 @@ public class SlaMonitoringService {
         if (!nearingSlaTickets.isEmpty()) {
             for (Ticket ticket : nearingSlaTickets) {
                 log.warn(
-                        "CRITICAL SLA WARNING: Ticket ID {} is nearing its SLA deadline at {}",
+                        "CRITICAL SLA WARNING: Ticket ID {} is nearing its "
+                                + "SLA deadline at {}",
                         ticket.getId(),
                         ticket.getSlaDeadline());
             }

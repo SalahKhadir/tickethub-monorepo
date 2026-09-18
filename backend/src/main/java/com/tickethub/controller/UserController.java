@@ -30,18 +30,20 @@ public class UserController {
     private final com.tickethub.repository.TicketRepository ticketRepository;
     /**
      * Javadoc.
-      * @param pUserRepository description
      */
     private final UserService userService;
 
     /**
-     * Javadoc.
-      * @param pTicketRepository description
-      * @param pUserService description
+     * Creates a user controller.
+     *
+     * @param pUserRepository repository for user operations
+     * @param pTicketRepository repository for ticket operations
+     * @param pUserService service for user operations
      */
-    public UserController(final UserRepository pUserRepository,
+    public UserController(
+            final UserRepository pUserRepository,
             final com.tickethub.repository.TicketRepository pTicketRepository,
-                    final UserService pUserService) {
+            final UserService pUserService) {
         this.userRepository = pUserRepository;
         this.ticketRepository = pTicketRepository;
         this.userService = pUserService;
@@ -96,8 +98,8 @@ public class UserController {
      */
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TechnicianResponse>> getUsers(@RequestParam(
-        required = false) String role) {
+    public ResponseEntity<List<TechnicianResponse>> getUsers(
+            @RequestParam(required = false) final String role) {
         if (role == null || role.isBlank()) {
             return ResponseEntity.ok(toTechnicianResponses(userRepository.
                 findAll()));
@@ -107,10 +109,12 @@ public class UserController {
             findByRole(parsedRole)));
     }
 
-    // This method is commented out because it conflicts with AdminUserController's @GetMapping
+    // This method is commented out because it conflicts with
+    // AdminUserController's @GetMapping
     // @GetMapping("/admin/users")
     // @PreAuthorize("hasRole('ADMIN')")
-    // public ResponseEntity<List<TechnicianResponse>> getUsersAdmin(@RequestParam(required = false) String role) {
+    // public ResponseEntity<List<TechnicianResponse>> getUsersAdmin(
+    //         @RequestParam(required = false) String role) {
     //     return getUsers(role);
     // }
 

@@ -16,38 +16,56 @@ public interface TicketService {
     TicketResponse createTicket(TicketRequest request);
 
     /**
-     * Javadoc.
-      * @return description
-      * @param priorityString description
-     * @param pageable description
+     * Retrieves tickets using optional filters.
+     *
+     * @param pageable pagination information
+     * @param statusString status filter
+     * @param priorityString priority filter
+     * @param categoryString category filter
+     * @return a page of tickets
      */
-    Page<TicketResponse> getAllTickets(Pageable pageable, String statusString,
-        String priorityString, String categoryString);
+    Page<TicketResponse> getAllTickets(
+            Pageable pageable,
+            String statusString,
+            String priorityString,
+            String categoryString);
 
     /**
-     * Javadoc.
-      * @return description
+     * Retrieves a ticket by identifier.
+     *
+     * @param id ticket identifier
+     * @return the ticket response
      */
     TicketResponse getTicketById(Long id);
 
     /**
-     * Javadoc.
-      * @return description
+     * Assigns a technician to a ticket.
+     *
+     * @param ticketId ticket identifier
+     * @param techId technician identifier
+     * @return the updated ticket
      */
     TicketResponse assignTechnician(Long ticketId, Long techId);
 
     /**
-     * Javadoc.
-      * @param solution description
-     * @return description
+     * Updates a ticket status.
+     *
+     * @param id ticket identifier
+     * @param newStatus new status
+     * @param solution resolution text
+     * @return the updated ticket
      */
-    TicketResponse updateTicketStatus(Long id, TicketStatus newStatus, String
-        solution);
+    TicketResponse updateTicketStatus(
+            Long id,
+            TicketStatus newStatus,
+            String solution);
 
     /**
-     * Javadoc.
-      * @return description
-      * @param id description
+     * Updates ticket details.
+     *
+     * @param id ticket identifier
+     * @param request update request
+     * @return the updated ticket
      */
     TicketResponse updateTicket(Long id, TicketUpdateRequest request);
 

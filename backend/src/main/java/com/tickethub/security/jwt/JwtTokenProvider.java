@@ -24,6 +24,19 @@ public class JwtTokenProvider {
     /**
      * Javadoc.
      */
+    private static final int ADMIN_ROLE_WEIGHT = 3;
+    /**
+     * Javadoc.
+     */
+    private static final int TECH_ROLE_WEIGHT = 2;
+    /**
+     * Javadoc.
+     */
+    private static final int CLIENT_ROLE_WEIGHT = 1;
+
+    /**
+     * Javadoc.
+     */
     private final SecretKey secretKey;
     /**
      * Javadoc.
@@ -53,10 +66,17 @@ public class JwtTokenProvider {
         String role = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .sorted((r1, r2) -> {
-                    int w1 = r1.equals("ROLE_ADMIN") ? 3 : r1.equals(
-                        "ROLE_TECH") ? 2 : 1;
-                    int w2 = r2.equals("ROLE_ADMIN") ? 3 : r2.equals(
-                        "ROLE_TECH") ? 2 : 1;
+                    int w1 = r1.equals("ROLE_ADMIN")
+                            ? ADMIN_ROLE_WEIGHT
+                            : r1.equals("ROLE_TECH")
+                                    ? TECH_ROLE_WEIGHT
+                                    : CLIENT_ROLE_WEIGHT;
+
+                    int w2 = r2.equals("ROLE_ADMIN")
+                            ? ADMIN_ROLE_WEIGHT
+                            : r2.equals("ROLE_TECH")
+                                    ? TECH_ROLE_WEIGHT
+                                    : CLIENT_ROLE_WEIGHT;
                     return Integer.compare(w2, w1);
                 })
                 .findFirst()

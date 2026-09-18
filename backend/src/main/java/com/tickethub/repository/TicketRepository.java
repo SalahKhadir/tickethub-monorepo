@@ -16,13 +16,13 @@ import java.util.List;
  * COMPARAISON: J2EE CLASSIQUE vs SPRING DATA JPA
  *
  * Approche sans Spring :
- * Utilisation de JDBC pur avec des classes DAO. Écriture de requêtes SQL manuelles
- * (SELECT * FROM tickets...). Gestion des Connection, PreparedStatement et mapping
+ * Utilisation de JDBC pur avec des classes DAO.
+ * Écriture de requêtes SQL manuelles (SELECT * FROM tickets...).
+ * Gestion des Connection, PreparedStatement et mapping
  * manuel du ResultSet vers les objets Java.
  *
  * Différence :
- * Spring Data JPA génère les requêtes à partir du nom des méthodes (Query Methods)
- * ou via @Query en JPQL.
+ * Spring Data JPA génère les requêtes à partir du nom des méthodes
  *
  * Avantage :
  * Réduction drastique du code répétitif ("boilerplate") et abstraction totale
@@ -32,20 +32,22 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
   /*
    * COMPARAISON PÉDAGOGIQUE: FILTRAGE DYNAMIQUE JDBC vs SPRING DATA JPA
    *
-   * En JDBC classique, la gestion de filtres optionnels (status, priority, category)
-   * aurait nécessité la construction manuelle d'une chaîne SQL dynamique avec des blocs "IF".
+   * En JDBC classique, la gestion de filtres optionnels
+   * (status, priority, category) aurait nécessité la construction
+   * manuelle d'une chaîne SQL dynamique avec des blocs "IF".
    * Par exemple :
    *   String sql = "SELECT * FROM tickets WHERE 1=1";
    *   if (status != null) { sql += " AND status = ?"; }
    *   if (priority != null) { sql += " AND priority = ?"; }
    *
-   * Cela augmente drastiquement le risque d'erreurs de syntaxe, l'oubli d'espaces et
-   * nécessite une gestion laborieuse de l'injection des paramètres (PreparedStatement.setDate(i, val)...).
+   * Cela augmente drastiquement le risque d'erreurs de syntaxe,
+   * l'oubli d'espaces et nécessite une gestion laborieuse de
+   * l'injection des paramètres (PreparedStatement.setDate(i, val)...).
    *
-   * Grâce à Spring Data JPA (et JPQL/HQL), nous pouvons écrire une clause statique :
-   * "(:param IS NULL OR t.field = :param)"
-   * Hibernate s'occupe de compiler intelligemment la requête et de sécuriser l'injection
-   * SQL automatiquement. Le code reste concis, propre et 100% sécurisé.
+   * Grâce à Spring Data JPA (et JPQL/HQL), nous pouvons écrire
+   * une clause statique : "(:param IS NULL OR t.field = :param)"
+   * Hibernate s'occupe de compiler intelligemment la requête et de sécuriser
+   * l'injection SQL automatiquement. Le code reste concis et sécurisé.
    */
   /**
    * Finds all tickets with filters.
@@ -188,7 +190,9 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
    * @param status description
    * @return description
    */
-  long countByAssignedTechnicianEmailAndStatus(String email, TicketStatus status);
+  long countByAssignedTechnicianEmailAndStatus(
+      String email,
+      TicketStatus status);
 
   /**
    * Counts tickets by technician email, priority and statuses.

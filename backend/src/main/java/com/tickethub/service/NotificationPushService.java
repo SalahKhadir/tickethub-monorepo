@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class NotificationPushService {
     /**
-     * Javadoc.
+     * Timeout used for notification connections.
      */
     private static final int NOTIFICATION_TIMEOUT_MS = 15000;
 
@@ -53,7 +53,7 @@ public class NotificationPushService {
             emitters.remove(email);
         }
 
-        // -1L or Long.MAX_VALUE for infinite timeout instead of 0L which might immediately close in some Tomcat versions
+        // Use an effectively unlimited timeout for SSE connections.
         SseEmitter emitter = new SseEmitter(-1L);
 
         emitters.put(email, emitter);
@@ -137,7 +137,7 @@ public class NotificationPushService {
     /**
      * Javadoc.
      */
-    @Scheduled(fixedRate = 15000) // Every 15 seconds
+    @Scheduled(fixedRate = NOTIFICATION_TIMEOUT_MS)
     public void sendHeartbeat() {
         emitters.forEach((email, emitter) -> {
             try {

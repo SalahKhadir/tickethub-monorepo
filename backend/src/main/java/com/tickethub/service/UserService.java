@@ -65,20 +65,17 @@ public class UserService {
      * Documentation JDBC vs Spring Data JPA :
      *
      * En JDBC classique, pour récupérer les techniciens (utilisateurs ayant le
-         rôle TECHNICIAN),
-     * il aurait fallu écrire une requête native complexe avec une jointure
-         explicite,
-     * par exemple :
+     * rôle TECHNICIAN), il aurait fallu écrire une requête native complexe avec
+     * une jointure explicite, par exemple :
      * SELECT u.* FROM users u INNER JOIN user_roles ur ON u.id = ur.user_id
-         WHERE ur.role = 'ROLE_TECH';
+     * WHERE ur.role = 'ROLE_TECH';
      * Il aurait ensuite fallu mapper manuellement le ResultSet vers l'objet
-         User.
+     * User.
      *
      * Avec Spring Data JPA, tout cela est géré automatiquement.
      * Le repository 'userRepository.findByRole(Role.ROLE_TECH)' (ou une simple
-         @Query JPQL)
-     * s'occupe de la jointure derrière les coulisses grâce au mapping ORM (
-         comme @ElementCollection ou les relations ManyToMany).
+     * @Query JPQL) s'occupe de la jointure derrière les coulisses grâce au
+     * mapping ORM (comme @ElementCollection ou les relations ManyToMany).
      * On obtient une collection d'objets Java prêts à l'emploi.
      *
      * @return a list of technician availability responses
@@ -114,17 +111,14 @@ public class UserService {
      * Documentation Pédagogique (J2EE vs Spring Security) :
      *
      * En J2EE classique, tu aurais dû gérer manuellement les états de compte
-         dans
-     * la session (HttpSession) ou via des filtres Servlet complexes pour
-         vérifier
-     * à chaque requête si l'utilisateur est approuvé.
+     * dans la session (HttpSession) ou via des filtres Servlet complexes pour
+     * vérifier à chaque requête si l'utilisateur est approuvé.
      *
      * Alors que Spring Security intègre nativement la gestion du statut
-         'enabled'
-     * dans l'interface UserDetails. Si l'attribut boolean 'enabled' est false,
-     * Spring Security bloquera la génération du JWT ou l'authentification avec
-         un
-     * DisabledException de manière totalement transparente.
+     * 'enabled' dans l'interface UserDetails. Si l'attribut boolean 'enabled'
+     * est false, Spring Security bloquera la génération du JWT ou
+     * l'authentification avec un DisabledException de manière totalement
+     * transparente.
      *
      * @param userId identifier of the user to approve
      */
@@ -139,7 +133,7 @@ public class UserService {
 
     /**
      * Creates a new user account with default roles (e.g., TECH) for
-         administrative purposes.
+     * administrative purposes.
      *
      * @param request the registration details
      */
@@ -155,8 +149,8 @@ public class UserService {
         user.setTel(request.getTel());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        // Admin creates a default tech or client. Assuming Tech for default, but can be improved.
-        // Let's assign ROLE_TECH by default or adjust as needed. We'll set ROLE_TECH for now.
+        // Admin creates a default technician or client.
+        // The current default is ROLE_TECH.
         user.setRoles(Set.of(Role.ROLE_TECH));
         user.setEnabled(true); // Account directly approved
 
@@ -189,12 +183,16 @@ public class UserService {
         String roleStr = user.getRoles().stream()
                 .map(Role::name)
                 .sorted((r1, r2) -> {
-                    int w1 = r1.equals("ROLE_ADMIN") ? ADMIN_ROLE_WEIGHT : r1.
-                        equals(
-                                "ROLE_TECH") ? TECH_ROLE_WEIGHT : CLIENT_ROLE_WEIGHT;
-                    int w2 = r2.equals("ROLE_ADMIN") ? ADMIN_ROLE_WEIGHT : r2.
-                        equals(
-                                "ROLE_TECH") ? TECH_ROLE_WEIGHT : CLIENT_ROLE_WEIGHT;
+                    int w1 = r1.equals("ROLE_ADMIN")
+                            ? ADMIN_ROLE_WEIGHT
+                            : r1.equals("ROLE_TECH")
+                                    ? TECH_ROLE_WEIGHT
+                                    : CLIENT_ROLE_WEIGHT;
+                    int w2 = r2.equals("ROLE_ADMIN")
+                            ? ADMIN_ROLE_WEIGHT
+                            : r2.equals("ROLE_TECH")
+                                    ? TECH_ROLE_WEIGHT
+                                    : CLIENT_ROLE_WEIGHT;
                     return Integer.compare(w2, w1);
                 })
                 .findFirst()

@@ -151,11 +151,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, String>> handleDataIntegrity(
             final DataIntegrityViolationException ex) {
+        final String message =
+                "Cannot delete this ticket because it has related records. "
+                        + ex.getMostSpecificCause().getMessage();
+
         return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of(
-                        "message",
-                        "Cannot delete this ticket because it has related records. "
-                                + ex.getMostSpecificCause().getMessage()));
+                .body(Map.of("message", message));
     }
 
     /**

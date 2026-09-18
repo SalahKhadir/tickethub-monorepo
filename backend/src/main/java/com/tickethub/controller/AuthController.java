@@ -35,8 +35,8 @@ public class AuthController {
       * @return description
      */
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> login(@Valid @RequestBody LoginRequest
-        loginRequest) {
+    public ResponseEntity<JwtResponse> login(
+            @Valid @RequestBody final LoginRequest loginRequest) {
         return ResponseEntity.ok(authService.login(loginRequest));
     }
 
@@ -50,7 +50,8 @@ public class AuthController {
         final RegisterRequest registerRequest) {
         authService.registerClient(registerRequest);
         RegistrationResponse response = new RegistrationResponse(
-                "Registration successful. Your account is pending admin approval.",
+                "Registration successful. Your account is pending "
+                        + "admin approval.",
                 true);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }

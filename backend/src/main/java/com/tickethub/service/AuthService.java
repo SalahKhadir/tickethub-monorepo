@@ -32,15 +32,16 @@ public class AuthService {
     private final UserRepository userRepository;
     /**
      * Javadoc.
-      * @param pAuthenticationManager description
      */
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Javadoc.
-      * @param pPasswordEncoder description
-      * @param pUserRepository description
-      * @param pJwtTokenProvider description
+     * Creates an authentication service.
+     *
+     * @param pAuthenticationManager authentication manager
+     * @param pJwtTokenProvider JWT token provider
+     * @param pUserRepository user repository
+     * @param pPasswordEncoder password encoder
      */
     public AuthService(
             final AuthenticationManager pAuthenticationManager,

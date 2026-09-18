@@ -17,17 +17,20 @@ public final class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
     /**
-     * Javadoc.
-      * @param pUserRepository description
+     * Creates a user details service.
+     *
+     * @param pUserRepository repository for user operations
      */
     public CustomUserDetailsService(final UserRepository pUserRepository) {
         this.userRepository = pUserRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(final String email) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(
+            final String email) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "User not found: " + email));
 
         List<SimpleGrantedAuthority> authorities = user.getRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.name()))

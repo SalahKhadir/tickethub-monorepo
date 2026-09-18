@@ -70,8 +70,8 @@ public class AdminUserController {
       * @return description
      */
     @PostMapping
-    public ResponseEntity<Void> createUserByAdmin(@Valid @RequestBody
-        RegisterRequest request) {
+    public ResponseEntity<Void> createUserByAdmin(
+            @Valid @RequestBody final RegisterRequest request) {
         userService.createUserByAdmin(request);
         return ResponseEntity.ok().build();
     }
