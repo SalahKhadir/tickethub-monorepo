@@ -20,6 +20,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationPushService {
+    /**
+     * Javadoc.
+     */
     private static final int NOTIFICATION_TIMEOUT_MS = 15000;
 
 

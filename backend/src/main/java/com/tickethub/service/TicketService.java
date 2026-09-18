@@ -10,18 +10,16 @@ import org.springframework.data.domain.Pageable;
 public interface TicketService {
     /**
      * Javadoc.
-      * @param categoryString description
       * @return description
-      * @param pageable description
-      * @param statusString description
+     * @param request description
      */
     TicketResponse createTicket(TicketRequest request);
 
     /**
      * Javadoc.
       * @return description
-      * @param id description
       * @param priorityString description
+     * @param pageable description
      */
     Page<TicketResponse> getAllTickets(Pageable pageable, String statusString,
         String priorityString, String categoryString);
@@ -29,23 +27,19 @@ public interface TicketService {
     /**
      * Javadoc.
       * @return description
-      * @param ticketId description
-      * @param techId description
      */
     TicketResponse getTicketById(Long id);
 
     /**
      * Javadoc.
       * @return description
-      * @param id description
-      * @param newStatus description
      */
     TicketResponse assignTechnician(Long ticketId, Long techId);
 
     /**
      * Javadoc.
-      * @param request description
       * @param solution description
+     * @return description
      */
     TicketResponse updateTicketStatus(Long id, TicketStatus newStatus, String
         solution);

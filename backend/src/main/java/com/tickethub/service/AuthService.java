@@ -32,15 +32,15 @@ public class AuthService {
     private final UserRepository userRepository;
     /**
      * Javadoc.
-      * @param authenticationManager description
+      * @param pAuthenticationManager description
      */
     private final PasswordEncoder passwordEncoder;
 
     /**
      * Javadoc.
-      * @param passwordEncoder description
-      * @param userRepository description
-      * @param jwtTokenProvider description
+      * @param pPasswordEncoder description
+      * @param pUserRepository description
+      * @param pJwtTokenProvider description
      */
     public AuthService(
             final AuthenticationManager pAuthenticationManager,

@@ -131,6 +131,7 @@ public class TicketController {
      * Javadoc.
       * @param request description
       * @param id description
+     * @return description
      */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('CLIENT','ADMIN')")

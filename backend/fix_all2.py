@@ -17,13 +17,10 @@ def fix_file(filepath, errors):
                 lines.insert(idx, "    /**\n     * Javadoc.\n     */\n")
             elif "Unused @param tag for" in msg:
                 param = re.search(r"Unused @param tag for '(.*?)'", msg).group(1)
-                # just remove the line
                 if '@param ' + param in lines[idx]:
                     del lines[idx]
             elif "Expected @param tag for" in msg:
                 param = re.search(r"Expected @param tag for '(.*?)'", msg).group(1)
-                # it might be that the parameter was renamed (e.g. pUserRepository), so find the old param in that block and replace it
-                # the block ends at the method declaration
                 old_param = param[1].lower() + param[2:] if param.startswith('p') else param
                 found = False
                 for j in range(idx, max(-1, idx-15), -1):
@@ -32,7 +29,6 @@ def fix_file(filepath, errors):
                         found = True
                         break
                 if not found:
-                    # just insert it at the bottom of the javadoc
                     for j in range(idx, max(-1, idx-15), -1):
                         if '*/' in lines[j]:
                             lines.insert(j, f"     * @param {param} description\n")
@@ -42,13 +38,15 @@ def fix_file(filepath, errors):
                     if '*/' in lines[j]:
                         lines.insert(j, f"     * @return description\n")
                         break
+        elif err_type == 'misc':
+            if 'FinalParameters' in msg:
+                param = re.search(r"Parameter (.*?) should be final.", msg).group(1)
+                lines[idx] = re.sub(r'([A-Za-z0-9_<>?\[\]]+)\s+(' + param + r')\b', r'final \1 \2', lines[idx])
         elif err_type == 'coding':
-            if "MagicNumber" in msg:
-                # We already created constants for most. Let's just fix the missed ones manually in the script
-                pass
+            pass
         elif err_type == 'sizes':
             if "LineLength" in msg:
-                # we just need to split it
+                # find the best place to split
                 line = lines[idx]
                 indent = re.match(r'^\s*', line).group(0) + "        "
                 split_idx = -1
@@ -76,16 +74,12 @@ def fix_file(filepath, errors):
                     lines.insert(idx+1, second_part)
         elif err_type == 'whitespace':
             if "OperatorWrap" in msg:
-                # The operator should be on a new line
                 op_match = re.search(r"'(.*?)' should be on a new line", msg)
                 if op_match:
                     op = op_match.group(1)
                     line = lines[idx]
                     if op in line:
-                        # find the operator at the end of the line
-                        # e.g., "something ==" -> "something\n== "
                         lines[idx] = re.sub(r'\s*' + re.escape(op) + r'\s*$', '\n', line)
-                        # and prepend to the next line
                         indent = re.match(r'^\s*', lines[idx+1]).group(0)
                         lines[idx+1] = indent + op + ' ' + lines[idx+1].lstrip()
                         
@@ -103,13 +97,11 @@ def main():
     for filepath, line, category, err_type, msg in errors:
         if filepath not in files_to_fix:
             files_to_fix[filepath] = []
-        files_to_fix[filepath].append((int(line), category, msg))
+        files_to_fix[filepath].append((int(line), err_type, msg))
         
     for filepath, errs in files_to_fix.items():
         if os.path.exists(filepath):
             fix_file(filepath, errs)
             
-    print(f"Fixed {len(files_to_fix)} files")
-
 if __name__ == '__main__':
     main()

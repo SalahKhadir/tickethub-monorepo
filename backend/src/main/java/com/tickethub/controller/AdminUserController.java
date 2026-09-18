@@ -29,7 +29,7 @@ public class AdminUserController {
 
     /**
      * Javadoc.
-      * @param userService description
+      * @param pUserService description
      */
     public AdminUserController(final UserService pUserService) {
         this.userService = pUserService;

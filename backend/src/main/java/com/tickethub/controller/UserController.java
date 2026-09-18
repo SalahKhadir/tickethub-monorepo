@@ -30,14 +30,14 @@ public class UserController {
     private final com.tickethub.repository.TicketRepository ticketRepository;
     /**
      * Javadoc.
-      * @param userRepository description
+      * @param pUserRepository description
      */
     private final UserService userService;
 
     /**
      * Javadoc.
-      * @param ticketRepository description
-      * @param userService description
+      * @param pTicketRepository description
+      * @param pUserService description
      */
     public UserController(final UserRepository pUserRepository,
             final com.tickethub.repository.TicketRepository pTicketRepository,

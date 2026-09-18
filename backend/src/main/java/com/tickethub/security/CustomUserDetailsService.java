@@ -18,7 +18,7 @@ public final class CustomUserDetailsService implements UserDetailsService {
 
     /**
      * Javadoc.
-      * @param userRepository description
+      * @param pUserRepository description
      */
     public CustomUserDetailsService(final UserRepository pUserRepository) {
         this.userRepository = pUserRepository;

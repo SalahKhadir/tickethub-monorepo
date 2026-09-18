@@ -16,6 +16,7 @@ public class DataInitializer {
      * Javadoc.
       * @param passwordEncoder description
       * @param userRepository description
+     * @return description
      */
     @Bean
     @Profile("local")

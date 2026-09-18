@@ -39,6 +39,7 @@ public class NotificationController {
      * Javadoc.
       * @param response description
       * @param token description
+     * @return description
      */
     @GetMapping(value = "/subscribe", produces = MediaType.
         TEXT_EVENT_STREAM_VALUE)

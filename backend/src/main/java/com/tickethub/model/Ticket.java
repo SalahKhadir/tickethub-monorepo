@@ -31,7 +31,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @AllArgsConstructor
 @Builder
 public class Ticket {
+    /**
+     * Javadoc.
+     */
     private static final int MAX_TITLE_LENGTH = 200;
+    /**
+     * Javadoc.
+     */
     private static final int MAX_ENUM_LENGTH = 20;
     /**
      * Javadoc.

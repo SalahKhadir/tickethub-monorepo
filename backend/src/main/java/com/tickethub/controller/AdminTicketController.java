@@ -27,6 +27,7 @@ public class AdminTicketController {
      * Javadoc.
       * @param request description
       * @param id description
+     * @return description
      */
     @PatchMapping("/{id}/assign")
     @PreAuthorize("hasRole('ADMIN')")

@@ -264,7 +264,8 @@ public class TicketServiceImpl implements TicketService {
         }
 
         ticket.setAssignedTechnician(technician);
-        // Status stays ACCEPTED — technician must click "Start Work" to move to IN_PROGRESS
+        // Status stays ACCEPTED
+        // technician must click "Start Work" to move to IN_PROGRESS
         Ticket updatedTicket = ticketRepository.save(ticket);
         TicketResponse response = toResponse(updatedTicket);
 
@@ -301,8 +302,8 @@ public class TicketServiceImpl implements TicketService {
                 throw new AccessDeniedException(
                         "Only ADMIN can accept a ticket.");
             }
-        } else if (currentStatus == TicketStatus.ACCEPTED && newStatus ==
-            TicketStatus.IN_PROGRESS) {
+        } else if (currentStatus == TicketStatus.ACCEPTED && newStatus
+            == TicketStatus.IN_PROGRESS) {
             if (!hasAnyAuthority(authentication, Set.of("ROLE_TECH"))) {
                 throw new AccessDeniedException(
                         "Only TECH can start work on aticket.");
@@ -312,10 +313,11 @@ public class TicketServiceImpl implements TicketService {
                     || !ticket.getAssignedTechnician().getId().equals(
                         currentUser.getId())) {
                 throw new AccessDeniedException(
-                        "Only the assigned technician can start work on thisticket.");
+                        "Only the assigned technician can start work on "
+                                + "thisticket.");
             }
-        } else if (currentStatus == TicketStatus.IN_PROGRESS && newStatus ==
-            TicketStatus.RESOLVED) {
+        } else if (currentStatus == TicketStatus.IN_PROGRESS && newStatus
+            == TicketStatus.RESOLVED) {
             if (!hasAnyAuthority(authentication, Set.of("ROLE_TECH"))) {
                 throw new AccessDeniedException(
                         "Only TECH can resolve a ticket.");
@@ -325,23 +327,24 @@ public class TicketServiceImpl implements TicketService {
                     || !ticket.getAssignedTechnician().getId().equals(
                         currentUser.getId())) {
                 throw new AccessDeniedException(
-                        "Only the assigned technician can resolve this ticket.");
+                        "Only the assigned technician can resolve "
+                                + "this ticket.");
             }
             if (solution == null || solution.isBlank()) {
                 throw new IllegalArgumentException(
                         "Solution is required toresolve a ticket.");
             }
             ticket.setSolution(solution);
-        } else if (currentStatus == TicketStatus.RESOLVED && newStatus ==
-            TicketStatus.CLOSED) {
+        } else if (currentStatus == TicketStatus.RESOLVED && newStatus
+            == TicketStatus.CLOSED) {
             if (!(isClient && isAuthor)) {
                 throw new AccessDeniedException(
                         "Only the CLIENT author canclose a ticket.");
             }
         } else {
             throw new IllegalStateException(
-                    "Invalid transition: " + currentStatus + " -> " +
-                        newStatus);
+                    "Invalid transition: " + currentStatus + " -> "
+                        + newStatus);
         }
 
         ticket.setStatus(newStatus);
@@ -372,7 +375,8 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = findTicketByIdOrThrow(id);
         Authentication authentication = getCurrentAuthentication();
 
-        // Critical security check: delete requires author ownership or staff role.
+        // Critical security check:
+        // delete requires author ownership or staff role.
         boolean isStaff = hasAnyAuthority(authentication, STAFF_AUTHORITIES);
         boolean isClient = hasAnyAuthority(authentication, CLIENT_AUTHORITIES);
         boolean isAuthor = ticket.getAuthor().getEmail().equalsIgnoreCase(
@@ -543,8 +547,8 @@ public class TicketServiceImpl implements TicketService {
         String avgResolutionTime = "N/A";
         if (!resolved.isEmpty()) {
             long totalMs = resolved.stream()
-                .filter(t -> t.getCreatedAt() != null && t.getUpdatedAt() !=
-                    null)
+                .filter(t -> t.getCreatedAt() != null && t.getUpdatedAt()
+                    != null)
                 .mapToLong(t -> Duration.between(t.getCreatedAt(), t.
                     getUpdatedAt()).toMillis())
                 .sum();
@@ -570,8 +574,8 @@ public class TicketServiceImpl implements TicketService {
     private Authentication getCurrentAuthentication() {
         Authentication authentication = SecurityContextHolder.getContext().
             getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() ||
-            "anonymousUser".equals(authentication.getName())) {
+        if (authentication == null || !authentication.isAuthenticated()
+            || "anonymousUser".equals(authentication.getName())) {
             throw new ForbiddenOperationException(
                     "Authentication is required.");
         }

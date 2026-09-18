@@ -13,9 +13,21 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegisterRequest {
+    /**
+     * Javadoc.
+     */
     private static final int MAX_STRING_LENGTH = 100;
+    /**
+     * Javadoc.
+     */
     private static final int MAX_EMAIL_LENGTH = 150;
+    /**
+     * Javadoc.
+     */
     private static final int MIN_PASSWORD_LENGTH = 8;
+    /**
+     * Javadoc.
+     */
     private static final int MAX_TEL_LENGTH = 30;
 
     /**

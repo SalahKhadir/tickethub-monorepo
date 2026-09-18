@@ -23,7 +23,7 @@ public class AuthController {
 
     /**
      * Javadoc.
-      * @param authService description
+      * @param pAuthService description
      */
     public AuthController(final AuthService pAuthService) {
         this.authService = pAuthService;

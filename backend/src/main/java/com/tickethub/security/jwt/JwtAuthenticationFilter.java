@@ -49,6 +49,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
      de passe.
  */
 public final class JwtAuthenticationFilter extends OncePerRequestFilter {
+    /**
+     * Javadoc.
+     */
     private static final int BEARER_PREFIX_LENGTH = 7;
 
     /**
@@ -62,8 +65,8 @@ public final class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Javadoc.
-      * @param userDetailsService description
-      * @param jwtTokenProvider description
+      * @param pUserDetailsService description
+      * @param pJwtTokenProvider description
      */
     public JwtAuthenticationFilter(final JwtTokenProvider pJwtTokenProvider,
         final CustomUserDetailsService pUserDetailsService) {

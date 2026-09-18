@@ -48,9 +48,9 @@ public class UserService {
     /**
      * Creates a user service.
      *
-     * @param userRepository repository for user operations
-     * @param ticketRepository repository for ticket operations
-     * @param passwordEncoder encoder used for user passwords
+     * @param pUserRepository repository for user operations
+     * @param pTicketRepository repository for ticket operations
+     * @param pPasswordEncoder encoder used for user passwords
      */
     public UserService(
             final UserRepository pUserRepository,

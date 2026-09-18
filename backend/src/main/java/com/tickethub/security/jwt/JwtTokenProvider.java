@@ -16,6 +16,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtTokenProvider {
+    /**
+     * Javadoc.
+     */
     private static final int TOKEN_SUBSTRING_START = 3;
 
     /**
@@ -29,7 +32,7 @@ public class JwtTokenProvider {
 
     /**
      * Javadoc.
-      * @param jwtExpirationMs description
+      * @param pJwtExpirationMs description
       * @param jwtSecret description
      */
     public JwtTokenProvider(

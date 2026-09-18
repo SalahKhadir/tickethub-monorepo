@@ -67,7 +67,7 @@ public class SecurityConfig {
 
     /**
      * Javadoc.
-      * @param jwtAuthenticationFilter description
+      * @param pJwtAuthenticationFilter description
      */
     public SecurityConfig(
             final JwtAuthenticationFilter pJwtAuthenticationFilter) {
