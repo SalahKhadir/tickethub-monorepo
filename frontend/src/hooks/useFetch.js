@@ -23,10 +23,12 @@ export function useFetch(url, options = {}) {
   // Keep option dependencies stable between renders when values did not change.
   const stableRequestOptions = useMemo(
     () => requestOptions,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(requestOptions)]
   );
   const stableFallbackUrls = useMemo(
     () => fallbackUrls,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [JSON.stringify(fallbackUrls)]
   );
 

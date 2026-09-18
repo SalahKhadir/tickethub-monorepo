@@ -38,6 +38,7 @@ export function NotificationProvider({ children }) {
     const esRef      = useRef(null);
     const retryRef      = useRef(null);
     const retryCountRef = useRef(0);
+    const openSSERef = useRef(null);
     const pingRef       = useRef(null);
     const MAX_RETRIES   = 5;
 
@@ -116,12 +117,16 @@ export function NotificationProvider({ children }) {
             }
             const delay = retryCountRef.current === 1 ? 3_000 : Math.min(5_000 * retryCountRef.current, 30_000);
             console.warn(`SSE connection error — retrying in ${delay / 1000}s… (attempt ${retryCountRef.current}/${MAX_RETRIES})`);
-            retryRef.current = setTimeout(openSSE, delay);
+            retryRef.current = setTimeout(() => {
+                openSSERef.current?.();
+            }, delay);
         };
     }, []);
 
     // Open SSE when authenticated, close when logged out
     useEffect(() => {
+        openSSERef.current = openSSE;
+
         if (isAuthenticated) {
             retryCountRef.current = 0;
             openSSE();
@@ -160,8 +165,10 @@ export function NotificationProvider({ children }) {
             // Clear seen cache so next login starts with a fresh unread count
             seenRef.current = new Set();
             localStorage.removeItem(STORAGE_KEY);
-            setNotifications([]);
-            setUnreadCount(0);
+            setTimeout(() => {
+                setNotifications([]);
+                setUnreadCount(0);
+            }, 0);
         }
 
         return () => {

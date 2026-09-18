@@ -44,11 +44,24 @@ export default function AdminOverviewPanel() {
         return Array.isArray(pageData?.content) ? pageData.content : [];
     }, [pageData]);
 
+    const [now, setNow] = useState(null);
+
+    useEffect(() => {
+        const initialUpdate = setTimeout(() => setNow(Date.now()), 0);
+        const interval = setInterval(() => setNow(Date.now()), 60_000);
+
+        return () => {
+            clearTimeout(initialUpdate);
+            clearInterval(interval);
+        };
+    }, []);
+
     const stats = useMemo(() => {
         const slaBreaches = tickets.filter(t =>
             t.priority === "CRITICAL" &&
             t.slaDeadline &&
-            new Date(t.slaDeadline).getTime() < Date.now() &&
+            now !== null &&
+            new Date(t.slaDeadline).getTime() < now &&
             t.status !== "RESOLVED" &&
             t.status !== "CLOSED"
         );
@@ -71,7 +84,7 @@ export default function AdminOverviewPanel() {
             criticalTickets,
             resolvedToday,
         };
-    }, [tickets]);
+    }, [tickets, now]);
 
     const recentTickets = useMemo(() =>
         [...tickets]

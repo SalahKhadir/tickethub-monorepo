@@ -18,10 +18,25 @@ export default function TechnicianDashboardPage() {
 
   const [stats, setStats]           = useState(DEFAULT_STATS);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [now, setNow] = useState(null);
+
+  useEffect(() => {
+      const updateNow = () => setNow(Date.now());
+
+      const initialUpdate = setTimeout(updateNow, 0);
+      const interval = setInterval(updateNow, 60_000);
+
+      return () => {
+          clearTimeout(initialUpdate);
+          clearInterval(interval);
+      };
+  }, []);
 
   useEffect(() => {
     let active = true;
-    setStatsLoading(true);
+    setTimeout(() => {
+      if (active) setStatsLoading(true);
+    }, 0);
     getTechnicianStats()
       .then((s) => {
         if (active) setStats({
@@ -44,11 +59,13 @@ export default function TechnicianDashboardPage() {
     return () => { active = false; };
   }, [tickets]);
 
-  const slaBreached = tickets.filter(t =>
-    t.priority === "CRITICAL" &&
-    t.slaDeadline &&
-    new Date(t.slaDeadline).getTime() < Date.now()
-  );
+  const slaBreached = now === null
+    ? []
+    : tickets.filter((t) =>
+        t.priority === "CRITICAL" &&
+        t.slaDeadline &&
+        new Date(t.slaDeadline).getTime() < now
+      );
 
   const recentTickets = [...tickets]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
@@ -74,7 +91,7 @@ export default function TechnicianDashboardPage() {
     refetch();
   };
 
-  const formatSLA = (ticket) => {
+  const formatSLA = (ticket, currentTime) => {
     const status = String(ticket?.status || "").toUpperCase();
     if (status === "RESOLVED" || status === "CLOSED") {
       return <span className="text-gray-300">—</span>;
@@ -84,7 +101,11 @@ export default function TechnicianDashboardPage() {
       return <span className="text-gray-300">—</span>;
     }
 
-    const diff = new Date(ticket.slaDeadline).getTime() - Date.now();
+    if (currentTime === null) {
+        return <span className="text-gray-300">—</span>;
+    }
+
+    const diff = new Date(ticket.slaDeadline).getTime() - currentTime;
     const abs = Math.abs(diff);
     const totalMinutes = Math.floor(abs / 60000);
     const days = Math.floor(totalMinutes / (24 * 60));
@@ -147,7 +168,7 @@ export default function TechnicianDashboardPage() {
         <h1 className="text-2xl font-semibold text-gray-900">
           Welcome back, {user?.username || user?.name || "Technician"} 👋
         </h1>
-        <p className="text-sm text-gray-500 mt-1">Here's what's on your plate today</p>
+        <p className="text-sm text-gray-500 mt-1">Here&apos;s what&apos;s on your plate today</p>
       </div>
 
       {/* SLA breach banner */}
@@ -244,7 +265,7 @@ export default function TechnicianDashboardPage() {
                   <td className="px-6 py-4 text-gray-900 font-medium text-sm max-w-50 truncate" title={ticket.title}>{ticket.title}</td>
                   <td className="px-6 py-4 whitespace-nowrap"><PriorityBadge priority={ticket.priority} /></td>
                   <td className="px-6 py-4 whitespace-nowrap"><StatusBadge status={ticket.status} /></td>
-                  <td className="px-6 py-4 whitespace-nowrap">{formatSLA(ticket)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{formatSLA(ticket, now)}</td>
                   <td className="px-6 py-4">{renderAction(ticket)}</td>
                 </tr>
               ))}

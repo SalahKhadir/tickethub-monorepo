@@ -92,18 +92,47 @@ export default function AdminReportsPage() {
     const load = () => {
         setLoading(true);
         setError("");
+
         getAdminGlobalStats()
             .then((data) => {
                 setStats({ ...DEFAULT_STATS, ...data });
                 setLastUpdated(new Date());
             })
             .catch((err) => {
-                setError(err?.response?.data?.message || err?.message || "Unable to load stats.");
+                setError(
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    "Unable to load stats."
+                );
             })
             .finally(() => setLoading(false));
     };
 
-    useEffect(() => { load(); }, []);
+    useEffect(() => {
+        let cancelled = false;
+
+        getAdminGlobalStats()
+            .then((data) => {
+                if (cancelled) return;
+                setStats({ ...DEFAULT_STATS, ...data });
+                setLastUpdated(new Date());
+            })
+            .catch((err) => {
+                if (cancelled) return;
+                setError(
+                    err?.response?.data?.message ||
+                    err?.message ||
+                    "Unable to load stats."
+                );
+            })
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
 
     return (
         <div className="space-y-8">

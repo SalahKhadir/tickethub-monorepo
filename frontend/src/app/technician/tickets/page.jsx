@@ -236,7 +236,7 @@ export default function TechnicianTicketsPage() {
             String(t?.id || "").includes(searchLower) ||
             (t?.title || "").toLowerCase().includes(searchLower)
         );
-    }, [allTickets, searchTerm]);
+    }, [allTickets, searchLower]);
 
     const handleStartWork = useCallback(async (ticketId) => {
         try {
