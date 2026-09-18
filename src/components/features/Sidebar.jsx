@@ -1,0 +1,204 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+    LayoutDashboard,
+    Ticket,
+    Users,
+    FileText,
+    History,
+    PlusCircle,
+    Menu,
+    X,
+    Bell,
+    ShieldCheck,
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { ROLES } from "@/constants/roles";
+import { ROUTES } from "@/constants/routes";
+import DashboardLogoutButton from "@/components/features/DashboardLogoutButton";
+import { useNotifications } from "@/context/NotificationContext";
+import NotificationDropdown from "@/components/features/NotificationDropdown";
+import { getPendingUsers } from "@/services/api";
+
+const NAV_BY_ROLE = {
+    [ROLES.ADMIN]: [
+        { label: "Dashboard",       href: ROUTES.ADMIN,                      icon: LayoutDashboard },
+        { label: "Tickets",         href: ROUTES.ADMIN_TICKETS,              icon: Ticket },
+        { label: "Technicians",     href: "/dashboard/admin/technicians",    icon: Users },
+        { label: "User Management", href: "/dashboard/admin/users",          icon: ShieldCheck },
+        { label: "Reports",         href: "/dashboard/admin/reports",        icon: FileText },
+        { label: "History",         href: "/dashboard/admin/history",        icon: History },
+    ],
+    [ROLES.TECHNICIAN]: [
+        { label: "Dashboard",        href: ROUTES.TECHNICIAN,         icon: LayoutDashboard },
+        { label: "Assigned Tickets", href: ROUTES.TECHNICIAN_TICKETS,  icon: Ticket },
+        { label: "History",          href: ROUTES.TECHNICIAN_HISTORY,  icon: History },
+    ],
+    [ROLES.CLIENT]: [
+        { label: "Dashboard",  href: ROUTES.CLIENT,             icon: LayoutDashboard },
+        { label: "My Tickets", href: ROUTES.CLIENT_TICKETS,     icon: Ticket },
+        { label: "New Ticket", href: ROUTES.CLIENT_NEW_TICKET,  icon: PlusCircle },
+    ],
+};
+
+const PORTAL_LABEL = {
+    [ROLES.ADMIN]:      "Admin Portal",
+    [ROLES.TECHNICIAN]: "Technician Portal",
+    [ROLES.CLIENT]:     "Client Portal",
+};
+
+const isActive = (pathname, href) =>
+    pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+
+const getInitials = (name = "") =>
+    name.split(" ").filter(Boolean).map((p) => p[0]).slice(0, 2).join("").toUpperCase() || "?";
+
+export default function Sidebar() {
+    const pathname = usePathname();
+    const { user } = useAuth();
+    const { unreadCount, markAllAsSeen } = useNotifications();
+    const [open, setOpen] = useState(false);
+    const [notifOpen, setNotifOpen] = useState(false);
+    const [pendingCount, setPendingCount] = useState(0);
+
+    const role = String(user?.role || "").toLowerCase();
+    const navItems = NAV_BY_ROLE[role] ?? [];
+    const portalLabel = PORTAL_LABEL[role] ?? "Portal";
+    const displayName = user?.username || user?.fullName || user?.name || "User";
+
+    useEffect(() => {
+        console.log("Current Unread:", unreadCount);
+    }, [unreadCount]);
+
+    // Poll pending users count for admin badge
+    useEffect(() => {
+        if (role !== ROLES.ADMIN) return;
+        const fetch = () =>
+            getPendingUsers()
+                .then((data) => {
+                    const list = Array.isArray(data) ? data : Array.isArray(data?.content) ? data.content : [];
+                    setPendingCount(list.length);
+                })
+                .catch(() => {});
+        fetch();
+        const id = setInterval(fetch, 60_000);
+        return () => clearInterval(id);
+    }, [role]);
+
+    const sidebarContent = (
+        <aside className="w-64 h-screen bg-[#111C2D] text-white flex flex-col">
+            {/* Logo */}
+            <div className="border-b border-[#1F2937] px-4 py-5 flex items-center gap-2.5">
+                <Image src="/TicketHub_LogoNOBG.png" alt="TicketHub" width={28} height={28} priority />
+                <div>
+                    <p className="text-sm font-semibold text-white leading-tight">TicketHub</p>
+                    <p className="text-xs text-gray-400 leading-tight">{portalLabel}</p>
+                </div>
+            </div>
+
+            {/* Nav */}
+            <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+                {navItems.map((item) => {
+                    const Icon = item.icon;
+                    const active = isActive(pathname, item.href);
+                    return (
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            onClick={() => setOpen(false)}
+                            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                                active
+                                    ? "bg-[#1F2937] text-white"
+                                    : "text-gray-300 hover:bg-[#1F2937] hover:text-white"
+                            }`}
+                        >
+                            <Icon size={17} className="shrink-0" />
+                            <span className="flex-1">{item.label}</span>
+                            {item.href === "/dashboard/admin/users" && pendingCount > 0 && (
+                                <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                                    {pendingCount}
+                                </span>
+                            )}
+                        </Link>
+                    );
+                })}
+            </nav>
+
+            {/* User footer */}
+            <div className="border-t border-[#1F2937] px-4 py-4 flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#2563eb] rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {getInitials(displayName)}
+                </div>
+                <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-white truncate">{displayName}</p>
+                    <p className="text-xs text-gray-400 capitalize truncate">{role}</p>
+                </div>
+                <div className="relative">
+                    <button
+                        type="button"
+                        onClick={() => { setNotifOpen((p) => !p); markAllAsSeen(); }}
+                        aria-label="Notifications"
+                        className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-[#1F2937] hover:text-white transition-colors"
+                    >
+                        <Bell size={17} />
+                        {unreadCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white leading-none">
+                                {unreadCount > 99 ? "99+" : unreadCount}
+                            </span>
+                        )}
+                    </button>
+                    {notifOpen && (
+                        <NotificationDropdown onClose={() => setNotifOpen(false)} />
+                    )}
+                </div>
+                <DashboardLogoutButton />
+            </div>
+        </aside>
+    );
+
+    return (
+        <>
+            {/* Desktop: fixed sidebar */}
+            <div className="hidden lg:flex fixed left-0 top-0 z-30 h-screen">
+                {sidebarContent}
+            </div>
+
+            {/* Mobile: hamburger trigger */}
+            <button
+                type="button"
+                onClick={() => setOpen(true)}
+                className="lg:hidden fixed top-4 left-4 z-40 flex h-9 w-9 items-center justify-center rounded-xl bg-[#111C2D] text-white shadow-lg"
+                aria-label="Open menu"
+            >
+                <Menu size={18} />
+            </button>
+
+            {/* Mobile: overlay drawer */}
+            {open && (
+                <>
+                    <div
+                        className="lg:hidden fixed inset-0 z-40 bg-black/50"
+                        onClick={() => setOpen(false)}
+                    />
+                    <div className="lg:hidden fixed left-0 top-0 z-50 h-screen">
+                        <div className="relative">
+                            <button
+                                type="button"
+                                onClick={() => setOpen(false)}
+                                className="absolute top-4 right-[-40px] z-50 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white"
+                                aria-label="Close menu"
+                            >
+                                <X size={16} />
+                            </button>
+                            {sidebarContent}
+                        </div>
+                    </div>
+                </>
+            )}
+        </>
+    );
+}
