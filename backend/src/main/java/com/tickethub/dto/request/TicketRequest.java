@@ -19,6 +19,8 @@ public record TicketRequest(
 
         @NotNull
         TicketCategory category) {
+
+    private static final int MAX_TITLE_LENGTH = 255;
 }
 
 
