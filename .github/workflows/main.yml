@@ -8,10 +8,24 @@ on:
 
 jobs:
   # ==========================================
-  # STAGE 1: Quality (Runs in parallel)
+  # STAGE 1: Quality & Secrets Gate (Parallel)
   # ==========================================
+  gitleaks:
+    name: "Security: Gitleaks Secrets Scan"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   lint-frontend:
-    name: "Quality: Lint Frontend"
+    name: "Quality: Frontend (ESLint, Prettier, Audit)"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -32,8 +46,17 @@ jobs:
         working-directory: ./frontend
         run: npm run lint
 
+      - name: Run Prettier Check
+        working-directory: ./frontend
+        run: npx prettier --check .
+
+      - name: Run NPM Audit
+        working-directory: ./frontend
+        # Consider removing `|| true` to enforce pipeline failure on high vulnerabilities
+        run: npm audit --audit-level=high || true 
+
   lint-backend:
-    name: "Quality: Lint & Verify Backend"
+    name: "Quality: Backend (Checkstyle, SpotBugs, Verify)"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -46,6 +69,6 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Checkstyle / Format Validation
+      - name: Maven Verify, Checkstyle & SpotBugs
         working-directory: ./backend
-        run: ./mvnw checkstyle:check # or your maven linter/compiler check
+        run: ./mvnw verify checkstyle:check spotbugs:check
