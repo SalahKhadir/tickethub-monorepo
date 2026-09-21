@@ -62,26 +62,14 @@ import java.util.List;
 public class SecurityConfig {
     /**
      * Javadoc.
-     */
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    /**
-     * Javadoc.
-      * @param pJwtAuthenticationFilter description
-     */
-    public SecurityConfig(
-            final JwtAuthenticationFilter pJwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = pJwtAuthenticationFilter;
-    }
-
-    /**
-     * Javadoc.
       * @param http description
+      * @param jwtAuthenticationFilter description
       * @return description
      */
     @Bean
     public SecurityFilterChain securityFilterChain(
-            final HttpSecurity http) throws
+            final HttpSecurity http,
+            final JwtAuthenticationFilter jwtAuthenticationFilter) throws
         Exception {
         http
                 .csrf(csrf -> csrf.disable())

@@ -15,7 +15,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtTokenProvider {
+public final class JwtTokenProvider {
     /**
      * Javadoc.
      */
