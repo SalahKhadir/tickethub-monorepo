@@ -7,8 +7,9 @@ export const formatSLA = (deadline, status, updatedAt) => {
   const isResolved = status === "RESOLVED" || status === "CLOSED";
   // If resolved, compare deadline with resolution time (updatedAt)
   // Otherwise, compare with current time
-  const compareTime = isResolved && updatedAt ? new Date(updatedAt).getTime() : Date.now();
-  
+  const compareTime =
+    isResolved && updatedAt ? new Date(updatedAt).getTime() : Date.now();
+
   const diff = deadlineDate.getTime() - compareTime;
   const abs = Math.abs(diff);
   const h = Math.floor(abs / 3600000);

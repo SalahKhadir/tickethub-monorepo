@@ -9,7 +9,7 @@ export const metadata = {
 export default async function DashboardRootLayout({ children }) {
   const cookieStore = await cookies();
   const token = cookieStore.get("th_token")?.value;
-  const role  = cookieStore.get("th_role")?.value;
+  const role = cookieStore.get("th_role")?.value;
   const enabled = cookieStore.get("th_enabled")?.value;
 
   if (!token || !role) {

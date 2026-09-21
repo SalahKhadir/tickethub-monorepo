@@ -60,9 +60,17 @@ export default function LoginForm() {
   };
 
   const DEV_ACCOUNTS = [
-    { label: "Client", email: "lilsall.kh@gmail.com", password: "AnaClient123" },
+    {
+      label: "Client",
+      email: "lilsall.kh@gmail.com",
+      password: "AnaClient123",
+    },
     { label: "Tech", email: "salaho.khadir@gmail.com", password: "AnaTech123" },
-    { label: "Admin", email: "salah.khadir@outlook.com", password: "AnaAdmin123" },
+    {
+      label: "Admin",
+      email: "salah.khadir@outlook.com",
+      password: "AnaAdmin123",
+    },
   ];
 
   const fillDevAccount = (account) => {
@@ -97,17 +105,20 @@ export default function LoginForm() {
       ) : null}
       {error.message ? (
         <div
-          className={`rounded-[10px] border px-4 py-3 text-sm ${error.type === "warning"
+          className={`rounded-[10px] border px-4 py-3 text-sm ${
+            error.type === "warning"
               ? "border-[rgba(245,158,11,0.25)] bg-[#FEF3C7] text-[#D97706]"
               : "border-[rgba(239,68,68,0.25)] bg-[#FEE2E2] text-[#991B1B]"
-            }`}
+          }`}
         >
           {error.message}
         </div>
       ) : null}
       {/* DEV ONLY — remove before production */}
       <div className="rounded-[10px] border border-dashed border-amber-300 bg-amber-50 p-3 space-y-2">
-        <p className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">Dev quick-login</p>
+        <p className="text-[11px] font-semibold text-amber-600 uppercase tracking-wider">
+          Dev quick-login
+        </p>
         <div className="flex gap-2">
           {DEV_ACCOUNTS.map((acc) => (
             <button

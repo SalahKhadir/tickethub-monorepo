@@ -3,5 +3,5 @@
 import DashboardLayout from "@/components/layouts/DashboardLayout";
 
 export default function ClientRouteLayout({ children }) {
-    return <DashboardLayout>{children}</DashboardLayout>;
+  return <DashboardLayout>{children}</DashboardLayout>;
 }

@@ -24,12 +24,12 @@ export function useFetch(url, options = {}) {
   const stableRequestOptions = useMemo(
     () => requestOptions,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(requestOptions)]
+    [JSON.stringify(requestOptions)],
   );
   const stableFallbackUrls = useMemo(
     () => fallbackUrls,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(fallbackUrls)]
+    [JSON.stringify(fallbackUrls)],
   );
 
   const fetchData = useCallback(async () => {
@@ -47,7 +47,10 @@ export function useFetch(url, options = {}) {
 
       for (const candidate of candidates) {
         try {
-          response = await api.get(normalizeApiPath(candidate), stableRequestOptions);
+          response = await api.get(
+            normalizeApiPath(candidate),
+            stableRequestOptions,
+          );
           break;
         } catch (candidateError) {
           lastError = candidateError;
@@ -65,7 +68,9 @@ export function useFetch(url, options = {}) {
       setData(response.data);
     } catch (err) {
       if (!err?.response) {
-        setError("API server unreachable. Verify backend is running and API URL is correct.");
+        setError(
+          "API server unreachable. Verify backend is running and API URL is correct.",
+        );
         return;
       }
 

@@ -48,7 +48,7 @@ jobs:
 
       - name: Run Prettier Check
         working-directory: ./frontend
-        run: npx prettier --check .
+        run: npm run format:check
 
       - name: Run NPM Audit
         working-directory: ./frontend

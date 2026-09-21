@@ -1,6 +1,12 @@
 "use client";
 
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { jwtDecode } from "jwt-decode";
 import api from "@/services/api";
 
@@ -104,8 +110,11 @@ export function AuthProvider({ children }) {
   const login = useCallback(async ({ email, password }) => {
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { token, accessToken, enabled: enabledFromResponse } =
-        response.data || {};
+      const {
+        token,
+        accessToken,
+        enabled: enabledFromResponse,
+      } = response.data || {};
       const resolvedToken = token || accessToken;
 
       if (!resolvedToken) {
@@ -114,7 +123,12 @@ export function AuthProvider({ children }) {
 
       const decoded = jwtDecode(resolvedToken);
       const roleFromToken = readRoleFromToken(decoded);
-      console.log("[Auth] JWT decoded:", { sub: decoded.sub, role: decoded.role, exp: decoded.exp, enabled: decoded.enabled });
+      console.log("[Auth] JWT decoded:", {
+        sub: decoded.sub,
+        role: decoded.role,
+        exp: decoded.exp,
+        enabled: decoded.enabled,
+      });
       if (!roleFromToken) {
         console.warn("Role claim missing in JWT; defaulting to client.");
       }
@@ -124,7 +138,7 @@ export function AuthProvider({ children }) {
       const enabled =
         typeof enabledFromResponse === "boolean"
           ? enabledFromResponse
-          : enabledFromToken ?? true;
+          : (enabledFromToken ?? true);
       const nextUser = { username, role, enabled };
 
       window.localStorage.setItem(TOKEN_KEY, resolvedToken);
@@ -140,16 +154,12 @@ export function AuthProvider({ children }) {
     } catch (error) {
       const status = error?.response?.status;
       const backendMessage =
-        error?.response?.data?.message ||
-        error?.response?.data?.error ||
-        "";
+        error?.response?.data?.message || error?.response?.data?.error || "";
       const normalizedMessage = String(backendMessage).toLowerCase();
 
       if ((status === 401 || status === 403) && normalizedMessage) {
         if (normalizedMessage.includes("disabled")) {
-          throw new Error(
-            "Your account is awaiting administrator approval."
-          );
+          throw new Error("Your account is awaiting administrator approval.");
         }
       }
 
@@ -185,7 +195,7 @@ export function AuthProvider({ children }) {
       login,
       logout,
     }),
-    [user, loading, login, logout]
+    [user, loading, login, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

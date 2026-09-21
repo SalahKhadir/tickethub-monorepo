@@ -36,7 +36,7 @@ export default function RegisterForm() {
       setError(
         err?.response?.data?.message ||
           err?.message ||
-          "Unable to submit registration."
+          "Unable to submit registration.",
       );
     } finally {
       setLoading(false);

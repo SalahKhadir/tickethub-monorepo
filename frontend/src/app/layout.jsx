@@ -16,10 +16,7 @@ export const metadata = {
   title: "TicketHub",
   description: "Incident management with secure, role-based access.",
   icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon.png", type: "image/png" },
-    ],
+    icon: [{ url: "/favicon.ico" }, { url: "/favicon.png", type: "image/png" }],
   },
 };
 

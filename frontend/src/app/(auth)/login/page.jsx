@@ -12,7 +12,11 @@ export default function LoginPage() {
       <p className="mt-2 text-sm text-slate-grey">
         Sign in to manage incidents with role-based access.
       </p>
-      <Suspense fallback={<div className="mt-6 text-sm text-slate-grey">Loading...</div>}>
+      <Suspense
+        fallback={
+          <div className="mt-6 text-sm text-slate-grey">Loading...</div>
+        }
+      >
         <LoginForm />
       </Suspense>
     </section>

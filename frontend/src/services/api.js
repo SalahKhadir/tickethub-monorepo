@@ -46,7 +46,7 @@ api.interceptors.response.use(
       clearLocalSession();
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 const normalizeApiPath = (path) => {
@@ -105,11 +105,13 @@ export const getTickets = (params = {}) => {
   const { page, status, priority, category, keyword } = params;
   const queryParams = {};
 
-  if (page !== undefined && page !== null)  queryParams.page     = page;
-  if (status   && status   !== "All" && status   !== "") queryParams.status   = status;
-  if (priority && priority !== "All" && priority !== "") queryParams.priority = priority;
-  if (category && category !== "All" && category !== "") queryParams.category = category;
-  if (keyword  && keyword.trim()  !== "")                queryParams.keyword  = keyword.trim();
+  if (page !== undefined && page !== null) queryParams.page = page;
+  if (status && status !== "All" && status !== "") queryParams.status = status;
+  if (priority && priority !== "All" && priority !== "")
+    queryParams.priority = priority;
+  if (category && category !== "All" && category !== "")
+    queryParams.category = category;
+  if (keyword && keyword.trim() !== "") queryParams.keyword = keyword.trim();
 
   return fetchAPI("/api/tickets", { method: "GET", params: queryParams });
 };
@@ -157,12 +159,18 @@ const toArrayPayload = (payload) => {
 const isTechnicianRecord = (user) => {
   const rawRole = user?.role || user?.userRole || user?.type || user?.profile;
   const normalizedRole = String(rawRole || "").toLowerCase();
-  return normalizedRole.includes("technician") || normalizedRole.includes("tech");
+  return (
+    normalizedRole.includes("technician") || normalizedRole.includes("tech")
+  );
 };
 
 const mapTechnicianRecord = (user = {}) => {
   const id =
-    user?.id || user?.userId || user?.technicianId || user?.uuid || user?.identifier;
+    user?.id ||
+    user?.userId ||
+    user?.technicianId ||
+    user?.uuid ||
+    user?.identifier;
   const label =
     user?.fullName ||
     [user?.prenom, user?.nom].filter(Boolean).join(" ") ||
@@ -199,18 +207,25 @@ export const assignTicket = async (id, technicianId) => {
 };
 
 export const getTechnicianAvailability = async () => {
-  const payload = await fetchAPI("/api/technicians/availability", { method: "GET" });
+  const payload = await fetchAPI("/api/technicians/availability", {
+    method: "GET",
+  });
   const list = Array.isArray(payload)
     ? payload
     : Array.isArray(payload?.content)
-    ? payload.content
-    : Array.isArray(payload?.data)
-    ? payload.data
-    : [];
+      ? payload.content
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : [];
   // Normalise to Map<id, activeTicketsCount> — handles both old and new DTO shapes
   return list.reduce((acc, entry) => {
-    const id    = entry?.id ?? entry?.technicianId ?? entry?.userId;
-    const count = entry?.activeTicketsCount ?? entry?.activeTickets ?? entry?.activeTicketCount ?? entry?.count ?? 0;
+    const id = entry?.id ?? entry?.technicianId ?? entry?.userId;
+    const count =
+      entry?.activeTicketsCount ??
+      entry?.activeTickets ??
+      entry?.activeTicketCount ??
+      entry?.count ??
+      0;
     if (id !== undefined && id !== null) {
       acc[String(id)] = Number(count);
     }

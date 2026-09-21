@@ -16,7 +16,7 @@ export default function TechniciansPage() {
     loading: ticketsLoading,
     error: ticketsError,
   } = useFetch("/api/tickets?page=0");
-  
+
   const tickets =
     ticketsData?.content ||
     ticketsData?.data ||
@@ -74,13 +74,19 @@ export default function TechniciansPage() {
   if (hasError) {
     return (
       <div className="flex justify-center items-center h-64">
-        <span className="text-red-500 text-sm">{errorTechs || ticketsError}</span>
+        <span className="text-red-500 text-sm">
+          {errorTechs || ticketsError}
+        </span>
       </div>
     );
   }
 
-  const busyTechs = technicians.filter((tech) => getActiveCount(tech) > 0).length;
-  const availableTechs = technicians.filter((tech) => getActiveCount(tech) === 0).length;
+  const busyTechs = technicians.filter(
+    (tech) => getActiveCount(tech) > 0,
+  ).length;
+  const availableTechs = technicians.filter(
+    (tech) => getActiveCount(tech) === 0,
+  ).length;
 
   return (
     <div className="w-full">
@@ -88,8 +94,12 @@ export default function TechniciansPage() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col items-center gap-2">
           <i className="ti ti-users text-blue-500 text-3xl"></i>
-          <span className="text-sm font-semibold text-gray-500">Total Technicians</span>
-          <span className="text-2xl font-bold text-gray-900">{technicians.length}</span>
+          <span className="text-sm font-semibold text-gray-500">
+            Total Technicians
+          </span>
+          <span className="text-2xl font-bold text-gray-900">
+            {technicians.length}
+          </span>
         </div>
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col items-center gap-2">
           <i className="ti ti-clock text-amber-500 text-3xl"></i>
@@ -99,7 +109,9 @@ export default function TechniciansPage() {
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex flex-col items-center gap-2">
           <i className="ti ti-circle-check text-green-500 text-3xl"></i>
           <span className="text-sm font-semibold text-gray-500">Available</span>
-          <span className="text-2xl font-bold text-gray-900">{availableTechs}</span>
+          <span className="text-2xl font-bold text-gray-900">
+            {availableTechs}
+          </span>
         </div>
       </div>
 
@@ -108,7 +120,9 @@ export default function TechniciansPage() {
         {technicians.length === 0 ? (
           <div className="p-10 flex flex-col items-center justify-center gap-3">
             <i className="ti ti-users text-gray-300 text-5xl"></i>
-            <span className="text-gray-500 font-medium">No technicians found</span>
+            <span className="text-gray-500 font-medium">
+              No technicians found
+            </span>
           </div>
         ) : (
           <table className="w-full text-left border-collapse">
@@ -116,7 +130,9 @@ export default function TechniciansPage() {
               <tr className="bg-gray-50 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                 <th className="px-6 py-3 border-b border-gray-100">Name</th>
                 <th className="px-6 py-3 border-b border-gray-100">Email</th>
-                <th className="px-6 py-3 border-b border-gray-100">Active Tickets</th>
+                <th className="px-6 py-3 border-b border-gray-100">
+                  Active Tickets
+                </th>
                 <th className="px-6 py-3 border-b border-gray-100">Status</th>
                 <th className="px-6 py-3 border-b border-gray-100 text-right"></th>
               </tr>
@@ -132,13 +148,15 @@ export default function TechniciansPage() {
                 const assignedTickets = tickets.filter(
                   (t) =>
                     (t.assigneeName && t.assigneeName === tech.fullName) ||
-                    (tech.username && t.assigneeName === tech.username)
+                    (tech.username && t.assigneeName === tech.username),
                 );
 
                 return (
                   <React.Fragment key={tech.id || Math.random()}>
                     <tr
-                      onClick={() => setExpandedTechId(isExpanded ? null : tech.id)}
+                      onClick={() =>
+                        setExpandedTechId(isExpanded ? null : tech.id)
+                      }
                       className={`border-t border-gray-100 transition text-sm cursor-pointer ${
                         isExpanded ? "bg-blue-50" : "hover:bg-gray-50"
                       }`}
@@ -148,7 +166,9 @@ export default function TechniciansPage() {
                           <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white text-xs font-bold">
                             {initials}
                           </div>
-                          <span className="text-gray-900 font-medium">{name}</span>
+                          <span className="text-gray-900 font-medium">
+                            {name}
+                          </span>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-gray-500">
@@ -180,9 +200,14 @@ export default function TechniciansPage() {
                     </tr>
                     {isExpanded && (
                       <tr>
-                        <td colSpan={5} className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+                        <td
+                          colSpan={5}
+                          className="px-6 py-4 bg-gray-50 border-t border-gray-100"
+                        >
                           <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-sm font-semibold text-gray-700">Assigned Tickets</h3>
+                            <h3 className="text-sm font-semibold text-gray-700">
+                              Assigned Tickets
+                            </h3>
                             <span className="bg-blue-100 text-blue-700 rounded-full px-2 py-0.5 text-xs font-semibold">
                               {assignedTickets.length}
                             </span>

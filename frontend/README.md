@@ -26,18 +26,18 @@ TicketHub is a modern, role-based IT support ticketing platform built with **Nex
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | [Next.js 16](https://nextjs.org) (App Router) |
-| UI Library | [React 19](https://react.dev) |
-| Styling | [Tailwind CSS v4](https://tailwindcss.com) |
-| Animations | [Framer Motion](https://www.framer.com/motion/) |
-| HTTP Client | [Axios](https://axios-http.com) |
-| Authentication | JWT (`jwt-decode`) stored in cookies & localStorage |
-| Icons | [Lucide React](https://lucide.dev) |
-| Toast Notifications | [react-hot-toast](https://react-hot-toast.com) |
-| Real-Time Updates | Server-Sent Events (SSE) |
-| Linting | ESLint (Next.js config) |
+| Layer               | Technology                                          |
+| ------------------- | --------------------------------------------------- |
+| Framework           | [Next.js 16](https://nextjs.org) (App Router)       |
+| UI Library          | [React 19](https://react.dev)                       |
+| Styling             | [Tailwind CSS v4](https://tailwindcss.com)          |
+| Animations          | [Framer Motion](https://www.framer.com/motion/)     |
+| HTTP Client         | [Axios](https://axios-http.com)                     |
+| Authentication      | JWT (`jwt-decode`) stored in cookies & localStorage |
+| Icons               | [Lucide React](https://lucide.dev)                  |
+| Toast Notifications | [react-hot-toast](https://react-hot-toast.com)      |
+| Real-Time Updates   | Server-Sent Events (SSE)                            |
+| Linting             | ESLint (Next.js config)                             |
 
 ---
 
@@ -57,11 +57,11 @@ TicketHub is a modern, role-based IT support ticketing platform built with **Nex
 
 ## User Roles
 
-| Role | Access |
-|---|---|
-| **Admin** | Full platform access — manage tickets, users, technicians, reports, and history |
-| **Technician** | View and action assigned tickets; update status to In Progress or Resolved |
-| **Client** | Submit new tickets and track the status of their own requests |
+| Role           | Access                                                                          |
+| -------------- | ------------------------------------------------------------------------------- |
+| **Admin**      | Full platform access — manage tickets, users, technicians, reports, and history |
+| **Technician** | View and action assigned tickets; update status to In Progress or Resolved      |
+| **Client**     | Submit new tickets and track the status of their own requests                   |
 
 ---
 
@@ -69,10 +69,10 @@ TicketHub is a modern, role-based IT support ticketing platform built with **Nex
 
 ### Public Pages
 
-| Route | Description |
-|---|---|
-| `/` | Landing page with Sign In and Request Access links |
-| `/login` | JWT login form; stores token in cookie and localStorage |
+| Route       | Description                                                           |
+| ----------- | --------------------------------------------------------------------- |
+| `/`         | Landing page with Sign In and Request Access links                    |
+| `/login`    | JWT login form; stores token in cookie and localStorage               |
 | `/register` | Self-registration form; account is pending until approved by an Admin |
 
 > Accounts registered through `/register` start with `enabled = false`. The Admin must approve them before they can log in.
@@ -84,6 +84,7 @@ TicketHub is a modern, role-based IT support ticketing platform built with **Nex
 Accessible at `/dashboard/admin` — requires the `admin` role.
 
 #### Overview (`/dashboard/admin`)
+
 - Summary cards: **SLA Breaches**, **Active Technicians**, **Critical Tickets**, **Resolved Today**
 - SLA breach banner with a direct link to the tickets list
 - Recent tickets table (5 most recent, sorted by creation date) with priority-coloured left borders
@@ -91,6 +92,7 @@ Accessible at `/dashboard/admin` — requires the `admin` role.
 - Auto-refreshes every 60 seconds
 
 #### Tickets (`/dashboard/admin/tickets`)
+
 - Full paginated ticket list with filtering by **status**, **priority**, **category**, and **keyword**
 - Inline ticket detail panel: description, assignee, SLA countdown
 - **Accept** new tickets (NEW → ACCEPTED)
@@ -98,21 +100,25 @@ Accessible at `/dashboard/admin` — requires the `admin` role.
 - Priority-coloured left borders (Critical = red, High = orange, Medium = yellow, Low = blue)
 
 #### Technicians (`/dashboard/admin/technicians`)
+
 - Summary stats: Total, Busy, and Available technician counts
 - Expandable rows showing each technician's assigned ticket list
 
 #### User Management (`/dashboard/admin/users`)
+
 - **Pending Approvals** tab — approve newly registered accounts; badge shows pending count
 - **All Users** tab — view all registered users with role, status, and join date
 - **Create User** modal — add a new Client or Technician account directly (name, email, phone, password, role)
 - Pending count badge also appears on the sidebar nav item
 
 #### Reports (`/dashboard/admin/reports`)
+
 - KPI cards: Total Tickets, Open/Active, Resolved Today, Critical SLA violations, Total Users, Average Resolution Time
 - Bar chart: Tickets by Category (Network, Software, Hardware, Security, Access, Other)
 - Manual refresh button
 
 #### History (`/dashboard/admin/history`)
+
 - Resolved and closed tickets grouped by category
 - Per-category average resolution time
 - Expandable rows: original request description alongside the technician's resolution notes
@@ -125,6 +131,7 @@ Accessible at `/dashboard/admin` — requires the `admin` role.
 Accessible at `/dashboard/technician` — requires the `technician` role.
 
 #### Overview (`/dashboard/technician`)
+
 - Personalised welcome message
 - Stats cards: **My Assigned Tickets**, **In Progress**, **Critical Priority**, **Resolved Today**
 - SLA breach banner for critical overdue tickets
@@ -133,10 +140,12 @@ Accessible at `/dashboard/technician` — requires the `technician` role.
   - **Resolve** — opens an inline solution textarea; submits with RESOLVED status
 
 #### Assigned Tickets (`/technician/tickets`)
+
 - Full paginated table of tickets assigned to the current technician
 - SLA countdown displayed for CRITICAL tickets (green = within SLA, amber = approaching, red = overdue/breached)
 
 #### History (`/technician/history`)
+
 - View of past resolved tickets assigned to the technician
 
 ---
@@ -146,14 +155,17 @@ Accessible at `/dashboard/technician` — requires the `technician` role.
 Accessible at `/dashboard/client` — requires the `client` role.
 
 #### Overview (`/dashboard/client`)
+
 - Summary of the client's tickets by status
 - Quick links to submit a new ticket or view existing ones
 
 #### Submit Ticket (`/dashboard/client/new-ticket`)
+
 - Form fields: **Title**, **Description**, **Priority** (Low / Medium / High / Critical), **Category** (Network / Hardware / Software / Access / Security / Other)
 - Redirects to the tickets list on successful submission
 
 #### My Tickets (`/dashboard/client/tickets`)
+
 - Paginated list of the client's submitted tickets
 - Filter by status and priority
 - Live status and priority badges
@@ -166,13 +178,13 @@ Accessible at `/dashboard/client` — requires the `client` role.
 NEW → ACCEPTED → IN_PROGRESS → RESOLVED → CLOSED
 ```
 
-| Status | Actor | Description |
-|---|---|---|
-| `NEW` | System | Ticket created by a client |
-| `ACCEPTED` | Admin | Admin accepts and queues the ticket |
-| `IN_PROGRESS` | Technician | Technician starts working on the ticket |
-| `RESOLVED` | Technician | Technician submits a solution |
-| `CLOSED` | System/Admin | Ticket is fully closed |
+| Status        | Actor        | Description                             |
+| ------------- | ------------ | --------------------------------------- |
+| `NEW`         | System       | Ticket created by a client              |
+| `ACCEPTED`    | Admin        | Admin accepts and queues the ticket     |
+| `IN_PROGRESS` | Technician   | Technician starts working on the ticket |
+| `RESOLVED`    | Technician   | Technician submits a solution           |
+| `CLOSED`      | System/Admin | Ticket is fully closed                  |
 
 **Priorities:** `LOW` · `MEDIUM` · `HIGH` · `CRITICAL`
 
@@ -199,20 +211,22 @@ NEW → ACCEPTED → IN_PROGRESS → RESOLVED → CLOSED
 ## Authentication & Route Protection
 
 Authentication state is stored in:
+
 - `th_token` — JWT access token (cookie + localStorage)
 - `th_role` — user role (cookie)
 - `th_enabled` — account enabled flag (cookie)
 
 **Middleware** (`middleware.js`) intercepts every `/dashboard/**` request:
+
 1. Redirects to `/login?redirect=<path>` if no token or role is present
 2. Redirects to `/login?pending=1` if the account is not yet enabled
 3. Redirects to the user's own dashboard home if they attempt to access a route for a different role
 
-| Route prefix | Allowed roles |
-|---|---|
-| `/dashboard/admin/**` | admin |
+| Route prefix               | Allowed roles     |
+| -------------------------- | ----------------- |
+| `/dashboard/admin/**`      | admin             |
 | `/dashboard/technician/**` | admin, technician |
-| `/dashboard/client/**` | admin, client |
+| `/dashboard/client/**`     | admin, client     |
 
 ---
 
@@ -313,9 +327,9 @@ If `NEXT_PUBLIC_API_BASE_URL` is not set, the Axios client falls back to `/api` 
 
 ## Available Scripts
 
-| Script | Description |
-|---|---|
-| `npm run dev` | Start the Next.js development server |
-| `npm run build` | Build for production |
-| `npm run start` | Start the production server |
-| `npm run lint` | Run ESLint |
+| Script          | Description                          |
+| --------------- | ------------------------------------ |
+| `npm run dev`   | Start the Next.js development server |
+| `npm run build` | Build for production                 |
+| `npm run start` | Start the production server          |
+| `npm run lint`  | Run ESLint                           |
