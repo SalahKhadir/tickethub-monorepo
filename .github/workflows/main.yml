@@ -58,6 +58,21 @@ jobs:
   lint-backend:
     name: "Quality: Backend (Checkstyle, SpotBugs, Verify)"
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tickethub
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=30
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -71,4 +86,8 @@ jobs:
 
       - name: Maven Verify, Checkstyle & SpotBugs
         working-directory: ./backend
+        env:
+          DB_URL: jdbc:mysql://127.0.0.1:3306/tickethub?serverTimezone=UTC
+          DB_USERNAME: root
+          DB_PASSWORD: root
         run: ./mvnw verify checkstyle:check spotbugs:check
