@@ -20,7 +20,7 @@ public record TicketRequest(
         @NotNull
         TicketCategory category) {
 
+    /** Maximum allowed title length for ticket creation requests. */
     private static final int MAX_TITLE_LENGTH = 255;
 }
-
 
